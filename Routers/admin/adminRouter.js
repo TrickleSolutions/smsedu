@@ -1,0 +1,128 @@
+   
+const express=require("express");
+const Router=express.Router();
+const { 
+   createCategory,
+   putCategory,
+   getCategory,
+   getSingleCategory,
+   deleteCategory,
+   createInstructor,
+   putInstructor,
+   getInstructor,
+   getCourse,
+   createCourse,
+   putCourse,
+   createAdmin,
+   loginAdmin,
+   putAdmin,
+   getAdmin,
+   deleteAdmin,
+   getSingleInstructor,
+       deleteCourse,
+       deleteInstructor,
+       createEnquiry,
+       getEnquiry,
+       deleteEnquiry,
+         createExpense,
+         getExpense,
+         deleteExpense,
+         putExpense,
+         putEnquiry,
+         getSingleCourse,
+         createStOfMonth,
+         getStOfMonth,
+         putStOfMonth,
+         delStOfMonth,
+         createincome,
+         getincome,
+         getSingleincome,
+         deleteincome,
+         putincome ,
+         getSingleExpense,
+         createLibrary,
+          getLibrary,
+           getSingleLibrary,
+           deleteLibrary, 
+           putLibrary,
+           getSingleAdmin,
+             getSingleinstructorofmonth,
+             getinstructorOfMonth,
+             putinstructorOfMonth,
+             delinstructorOfMonth,
+             createinstructorOfMonth
+
+      }=require('../../controllers/admin/AdminController')
+const course_upload=require('../../multer/admin/course_upload')
+const studentofmonth_upload=require('../../multer/admin/StudentOfMonth')
+const instructorofmonth_upload=require('../../multer/admin/Instructorofmonth')
+const instructorProfile=require('../../multer/admin/InsructorProfile')
+const  Admin_upload=require('../../multer/admin/Amin_upload')
+//Admin 
+Router.route('/admin').post(createAdmin);
+Router.route('/adminlogin').post(loginAdmin);
+Router.route('/admin').get(getAdmin);
+Router.route('/admin/:_id').get(getSingleAdmin);
+Router.route('/admin/:_id').delete(deleteAdmin);
+Router.route('/admin/:_id').put(Admin_upload.single('profilePic'),putAdmin);
+
+
+
+ 
+Router.route('/category/:_id').put(putCategory);
+Router.route('/category/:_id').delete(deleteCategory); 
+Router.route('/category/:_id').get(getSingleCategory); 
+Router.route('/category').post( createCategory);
+Router.get('/category',getCategory)
+
+
+Router.route('/library/:book_no').put(putLibrary);
+Router.route('/library/:book_no').delete(deleteLibrary); 
+Router.route('/library/:book_no').get(getSingleLibrary); 
+Router.route('/library').post( createLibrary);
+Router.get('/library',getLibrary)
+
+
+Router.route('/income').post( createincome);
+Router.route('/income').get(getincome);
+Router.route('/income/:_id').delete(deleteincome);
+Router.route('/income/:_id').get(getSingleincome);
+Router.route('/income/:_id').put(putincome);
+
+
+
+Router.route('/instructor').post(createInstructor);
+Router.route('/instructor').get(getInstructor);
+Router.route('/instructor/:_id').delete(deleteInstructor);
+Router.route('/instructor/:_id').put(instructorProfile.single('profilePic'),putInstructor);
+Router.route('/instructor/:_id').get(getSingleInstructor);
+Router.route('/course').post(course_upload.single('img'),createCourse);
+Router.route('/course').get(getCourse);
+Router.route('/course/:_id').get(getSingleCourse);
+Router.route('/course/:_id').delete(deleteCourse);
+Router.route('/course/:_id').put(course_upload.single('img'),putCourse);
+Router.route('/enquiry').post(createEnquiry);
+Router.route('/enquiry').get(getEnquiry);
+Router.route('/enquiry/:contact').delete(deleteEnquiry);
+Router.route('/enquiry/:contact').put(putEnquiry);
+
+
+Router.route('/expense').post(createExpense);
+Router.route('/expense/:_id').put(putExpense);
+Router.route('/expense').get(getExpense);
+Router.route('/expense/:_id').get(getSingleExpense);
+Router.route('/expense/:_id').delete(deleteExpense);
+
+
+Router.route('/studentofmonth').post(studentofmonth_upload.single('img'),createStOfMonth);
+Router.route('/studentofmonth').get(getStOfMonth);
+Router.route('/studentofmonth/:regno').delete(delStOfMonth);
+Router.route('/studentofmonth/:regno').put(studentofmonth_upload.single('img'),putStOfMonth);
+
+ 
+Router.route('/instructorofmonth').post(instructorofmonth_upload.single('img'),createinstructorOfMonth);
+Router.route('/instructorofmonth').get(getinstructorOfMonth);
+Router.route('/instructorofmonth/:_id').delete(delinstructorOfMonth);
+Router.route('/instructorofmonth/:_id').put(instructorofmonth_upload.single('img'),putinstructorOfMonth);
+Router.route('/instructorofmonth/:_id').get(getSingleinstructorofmonth);
+   module.exports=Router; 
