@@ -18,17 +18,17 @@ app.use('/api',StudentRoute);
 app.use('/api',TeacherRoute);
 
 
-app.use("/coursepic", express.static("./assets/admin/course_upload"));
-app.use("/assignmentpic", express.static("./assets/teachers/assignment_upload"));
-app.use("/eventpic", express.static("./assets/teachers/events_upload"));
-app.use("/incomepic", express.static("./assets/teachers/incomr_upload"));
-app.use("/stprofilepic", express.static("./assets/students/stprofilepic"));
-app.use("/videocontent", express.static("./assets/teachers/CourseContent"));
-app.use("/docxcontent", express.static("./assets/teachers/CourseContent"));
-app.use("/teacherpic", express.static("./assets/admin/instructorProfile"));
-app.use("/adminpic", express.static("./assets/admin/anminprofile"));
-app.use("/studentofmonth", express.static("./assets/admin/studentofmonth"));
-app.use("/instructorofmonth", express.static("./assets/admin/instructorofmonth"));
+app.use("/api/coursepic", express.static("./assets/admin/course_upload"));
+app.use("/api/assignmentpic", express.static("./assets/teachers/assignment_upload"));
+app.use("/api/eventpic", express.static("./assets/teachers/events_upload"));
+app.use("/api/incomepic", express.static("./assets/teachers/incomr_upload"));
+app.use("/api/stprofilepic", express.static("./assets/students/stprofilepic"));
+app.use("/api/videocontent", express.static("./assets/teachers/CourseContent"));
+app.use("/api/docxcontent", express.static("./assets/teachers/CourseContent"));
+app.use("/api/teacherpic", express.static("./assets/admin/instructorProfile"));
+app.use("/api/adminpic", express.static("./assets/admin/anminprofile"));
+app.use("/api/studentofmonth", express.static("./assets/admin/studentofmonth"));
+app.use("/api/instructorofmonth", express.static("./assets/admin/instructorofmonth"));
 
 
 app.get('/ip', (req, res) => {
