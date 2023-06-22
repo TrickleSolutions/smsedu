@@ -666,7 +666,7 @@ const getLibrary=async(req,res)=>{
 
   let data = await LibrarySchema.find( );
 
-  resp.status(200).json({
+  res.status(200).json({
     
   })
 }
