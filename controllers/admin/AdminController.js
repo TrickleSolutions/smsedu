@@ -8,6 +8,7 @@ const IncomeSchema=require('../../models/admin/income')
 const LibrarySchema=require('../../models/admin/Library')
 const CategorySchema=require('../../models/admin/category')
 const InstructorOfMonthSchema=require('../../models/admin/instructorofmonth')
+const Student_RegisterSchema=require('../../models/students/StudentModel')
 const createAdmin=async(req,resp)=>{
     try { 
         
@@ -828,7 +829,27 @@ const delinstructorOfMonth=async(req,res)=>{
 }
 
 
+const  putApproveStStatus=async(req,res)=>{
+  try {
+  
+   const status=req.query.status
+  console.log(status,req.params.regno)
+     let data = await Student_RegisterSchema.updateOne(
+      {regno:req.params.regno},
+      { $set:   {
+       status:req.query.status
+      } } 
+  );
+       res.send(data);
+
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
 module.exports={ 
+  putApproveStStatus,
+
   getSingleinstructorofmonth, //all the instructor Off Months 
   createinstructorOfMonth,
   getinstructorOfMonth,

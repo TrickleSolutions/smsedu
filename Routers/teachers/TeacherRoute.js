@@ -13,8 +13,17 @@ const { getAssignment,createAssignment,putAssignment,delAssignment,createAddFee,
     createContentLink,getContentLink,getSingleContentLink, deleteContentLink,putContentLink,
     createContentDoc,getContentDoc,getSingleContentDoc,deleteContentDoc,putContentDoc,
     createContentVideo, getContentVideo  ,getSingleContentVideo ,deleteContentVideo, putContentVideo  ,
-                       }=require('../../controllers/teachers/TeacherController')
+    putStStatusReq,deleteStStatusReq,getSingleStStatusReq,getStStatusReq,createStStatusReq               
+  
+  }=require('../../controllers/teachers/TeacherController')
 /**fee */
+
+Router.route('/reqststatus/:_id').put(putStStatusReq);
+Router.route('/reqststatus/:_id').delete(deleteStStatusReq); 
+Router.route('/reqststatus/:_id').get(getSingleStStatusReq); 
+Router.route('/reqststatus').post( createStStatusReq);
+Router.route('/reqststatus').get(getStStatusReq)
+
 
 Router.route('/videocontent/:_id').put(coursecontentvideo_upload.single("video"),putContentVideo);
 Router.route('/videocontent/:_id').delete(deleteContentVideo); 

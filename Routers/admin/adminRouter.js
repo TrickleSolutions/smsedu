@@ -50,7 +50,10 @@ const {
              getinstructorOfMonth,
              putinstructorOfMonth,
              delinstructorOfMonth,
-             createinstructorOfMonth
+             createinstructorOfMonth,
+
+             ///aprove St Status
+             putApproveStStatus
 
       }=require('../../controllers/admin/AdminController')
 const course_upload=require('../../multer/admin/course_upload')
@@ -66,9 +69,11 @@ Router.route('/admin/:_id').get(getSingleAdmin);
 Router.route('/admin/:_id').delete(deleteAdmin);
 Router.route('/admin/:_id').put(Admin_upload.single('profilePic'),putAdmin);
 
-
-
+///Student Status Request api.........
+Router.route('/approvestatus/:regno').put(putApproveStStatus);
  
+
+//Category
 Router.route('/category/:_id').put(putCategory);
 Router.route('/category/:_id').delete(deleteCategory); 
 Router.route('/category/:_id').get(getSingleCategory); 

@@ -9,6 +9,7 @@ const nodemailer = require("nodemailer");
 const EventsSchema=require('../../models/Teacher/Events')
 const QueriesSchema=require('../../models/students/Queries')
 const AcademicSchema=require('../../models/students/Academicjs')
+const stStatusReqSchema=require('../../models/Teacher/Student_status_req')
 const COurseContentLinkSchema=require('../../models/Teacher/CourseContentLink')
 const COurseContentDocxSchema=require('../../models/Teacher/CourseContentdoc')
 const COurseContentVedioSchema=require('../../models/Teacher/CourseConent_vadio')
@@ -565,11 +566,61 @@ const putContentLink=async(req,res)=>{
    }
  
 }
+const createStStatusReq=async(req,resp)=>{
+  try { 
+      
+    const  { regno,name,status}=req.body 
+       let data = new stStatusReqSchema({regno,name,status}); 
+     let result=  await data.save(); 
+        resp.send(result) 
+   } catch (err) {
+     console.log(err);
+   }
+}
+
+const getStStatusReq=async(req,res)=>{
+
+ let data = await stStatusReqSchema.find(); 
+  res.send(data);
+}
+const getSingleStStatusReq=async(req,res)=>{
+
+  let data = await stStatusReqSchema.find({_id:req.params._id});
+
+  res.send(data);
+}
+
+const deleteStStatusReq= async (req, resp) => {
+try {
+  console.log(req.params);
+  let data = await stStatusReqSchema.deleteOne({_id:req.params._id});
+  resp.send(data);
+} catch (err) {
+  console.log(err);
+}
+}
+const putStStatusReq=async(req,res)=>{
+  try{
+    
+    const {regno,name,status}=req.body 
+     let data = await stStatusReqSchema .updateOne(
+      {_id:req.params._id},
+      { $set: { regno,name,status}} 
+  );
+       res.send(data);
+
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
 module.exports={
   createContentLink,getContentLink,getSingleContentLink,getSingleContentLink,deleteContentLink,putContentLink,
   createContentDoc,getContentDoc,getSingleContentDoc,deleteContentDoc,putContentDoc,
   createContentVideo, getContentVideo  ,getSingleContentVideo ,deleteContentVideo, putContentVideo  ,
   createAcademic,getAcademic, getSingleAcademic,deleteAcademic,putAcademic,  createEvent,getEvent,getSingleEvent,deleteEvent,putEvent, createQuery,getQuery,getSingleQuery,deleteQuery,putQuery,
   getAssignment,createAssignment,putAssignment,delAssignment,createAddFee,putAddFee,delAddFee,getAllAddFee,gettotalpaidFee,getsingleFee,getFee
- , loginInstructor,createScheduleClass,putScheduleClass  ,delScheduleClass,getAllScheduleClass, getAllResult,getsingleResult,delResult,putResult,createResult} 
+ , loginInstructor,createScheduleClass,putScheduleClass  ,delScheduleClass,getAllScheduleClass, getAllResult,getsingleResult,delResult,putResult,createResult,
+ putStStatusReq,deleteStStatusReq,getSingleStStatusReq,getStStatusReq,createStStatusReq
+} 
  
