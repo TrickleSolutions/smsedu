@@ -833,7 +833,7 @@ const  putApproveStStatus=async(req,res)=>{
   try {
   
    const status=req.query.status
-  console.log(status,req.params.regno)
+ // console.log(status,req.params.regno)
      let data = await Student_RegisterSchema.updateOne(
       {regno:req.params.regno},
       { $set:   {
