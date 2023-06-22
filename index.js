@@ -30,24 +30,7 @@ app.use("/api/adminpic", express.static("./assets/admin/anminprofile"));
 app.use("/api/studentofmonth", express.static("./assets/admin/studentofmonth"));
 app.use("/api/instructorofmonth", express.static("./assets/admin/instructorofmonth"));
 
-
-app.get('/ip', (req, res) => {
-    const geo = geoip.lookup(ip);
-            
-    // res.json({
-    //     Country: geo.country,
-    //     Region: geo.region,
-    //     City:geo.city,
-         
-    //   });
-    res.send(geo.region)
-
-//     console.log(`Country: ${geo.country}`);
-// console.log(`Region: ${geo.region}`);
-// console.log(`City: ${geo.city}`);
-    
-  });
-
+ 
 
 app.listen(PORT, () => {
     console.log("Hi Amit your server is running at  this :" + PORT)
