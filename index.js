@@ -2,8 +2,7 @@ const express=require('express');
 const app=express();
 const bodyParser=require("body-parser");
 const cors=require('cors');
-const geoip = require('geoip-lite');
-const ip = require('ip').address();
+ 
 const PORT=process.env.PORT || 8000;
 const   adminRouter=require('./Routers/admin/adminRouter')
 const  StudentRoute=require('./Routers/students/StudentRoute');
@@ -28,7 +27,7 @@ app.use("/api/docxcontent", express.static("./assets/teachers/CourseContent"));
 app.use("/api/teacherpic", express.static("./assets/admin/instructorProfile"));
 app.use("/api/adminpic", express.static("./assets/admin/anminprofile"));
 app.use("/api/studentofmonth", express.static("./assets/admin/studentofmonth"));
-app.use("/api/instructorofmonth", express.static("./assets/admin/instructorofmonth"));
+app.use("/api/instructorofmonths", express.static("./assets/admin/instructorofmonth"));
 
  
 
