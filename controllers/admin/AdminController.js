@@ -9,6 +9,7 @@ const LibrarySchema=require('../../models/admin/Library')
 const CategorySchema=require('../../models/admin/category')
 const InstructorOfMonthSchema=require('../../models/admin/instructorofmonth')
 const Student_RegisterSchema=require('../../models/students/StudentModel')
+const AppointmentSchema=require('../../models/admin/Appointment')
 const createAdmin=async(req,resp)=>{
     try { 
         
@@ -847,7 +848,89 @@ const  putApproveStStatus=async(req,res)=>{
    }
  
 }
+
+const createAppointment= async(req,resp)=>{
+  try { 
+  
+  let {name,mobile,msg}=req.body    
+     const usermail = await AppointmentSchema.findOne({ mobile: mobile });
+     console.log(usermail);
+     if (usermail) {
+       resp.status(404).json({
+         code: 404,
+         message: "Mobile aleready exist....  ",
+         data: [],
+         error: false,
+         status: false,
+       });
+     } else {
+       let data = new AppointmentSchema( {name,mobile,msg});
+      
+         await data.save();
+   
+ 
+       resp.status(200).json({
+         code: 200,
+         message: "Appointment applied  successfully",
+ 
+         error: false,
+         status: true,
+       });
+     }
+   } catch (err) {
+     console.log(err);
+   }
+}
+
+const putAppointment=async(req,res)=>{
+  try {
+
+  let {name,mobile,msg}=req.body
+
+     let data = await AppointmentSchema.updateOne(
+     {_id: req.params._id},
+      { $set: {name,mobile,msg}}
+
+  );
+       res.send(data);
+
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
+const getAppointment =async(req,res)=>{
+
+  let data = await AppointmentSchema.find( );
+
+  res.send(data);
+}
+
+const getSingleAppointment=async(req,res)=>{
+
+  let data = await AppointmentSchema.find({_id:req.params._id});
+
+  res.send(data);
+}
+
+ const deleteAppointment= async (req, resp) => {
+  try {
+    console.log(req.params);
+    let data = await AppointmentSchema.deleteOne({_id:req.params._id});
+    resp.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports={ 
+  
+  createAppointment ,
+  putAppointment    ,
+  getAppointment ,
+  getSingleAppointment,
+  deleteAppointment,
+
   putApproveStStatus,
 
   getSingleinstructorofmonth, //all the instructor Off Months 

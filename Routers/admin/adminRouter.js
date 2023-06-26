@@ -53,7 +53,13 @@ const {
              createinstructorOfMonth,
 
              ///aprove St Status
-             putApproveStStatus
+             putApproveStStatus,
+
+             createAppointment ,
+             putAppointment    ,
+             getAppointment ,
+             getSingleAppointment,
+             deleteAppointment
 
       }=require('../../controllers/admin/AdminController')
 const course_upload=require('../../multer/admin/course_upload')
@@ -61,6 +67,13 @@ const studentofmonth_upload=require('../../multer/admin/StudentOfMonth')
 const instructorofmonth_upload=require('../../multer/admin/Instructorofmonth')
 const instructorProfile=require('../../multer/admin/InsructorProfile')
 const  Admin_upload=require('../../multer/admin/Amin_upload')
+///appointment
+Router.route('/appoint/:_id').put(putAppointment);
+Router.route('/appoint/:_id').delete(deleteAppointment); 
+Router.route('/appoint/:_id').get(getSingleAppointment); 
+Router.route('/appoint').post( createAppointment);
+Router.route('/appoint').get(getAppointment)
+
 //Admin 
 Router.route('/admin').post(createAdmin);
 Router.route('/adminlogin').post(loginAdmin);
@@ -78,7 +91,7 @@ Router.route('/category/:_id').put(putCategory);
 Router.route('/category/:_id').delete(deleteCategory); 
 Router.route('/category/:_id').get(getSingleCategory); 
 Router.route('/category').post( createCategory);
-Router.get('/category',getCategory)
+Router.route('/category').get(getCategory)
 
 
 Router.route('/library/:book_no').put(putLibrary);
