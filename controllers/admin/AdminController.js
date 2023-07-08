@@ -13,17 +13,7 @@ const AppointmentSchema=require('../../models/admin/Appointment')
 const createAdmin=async(req,resp)=>{
     try { 
         
-        const name=req.body.name;
-      
-    const address=req.body.address; 
-       const contact=req.body.contact;
-       const email=req.body.email;
-        const gender=req.body.gender;
-         const dob=req.body.dob;
-         const qualification=req.body.qualification;
-       const degree=req.body.degree;
-       const exp=req.body.exp;
-       const password=req.body.password;
+        const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role }=req.body
      
         
        const usermail = await AdminRegisterSchema.findOne({ email: email });
@@ -37,27 +27,11 @@ const createAdmin=async(req,resp)=>{
            status: false,
          });
        } else {
-         let data = new AdminRegisterSchema({
-           
-      name, 
-      address,
-      contact,
-      email,
-      gender,
-      dob,
-      qualification,
-      degree,
-      exp,
-      password
-         });
-        
-         let result = await data.save();
-     
-   
+         let data = new AdminRegisterSchema( { name,address,contact,email,gender,dob,qualification,degree,exp,password, role });
+          await data.save(); 
          resp.status(200).json({
            code: 200,
-           message: "user  Register successfully",
-   
+           message: "user  Register successfully", 
            error: false,
            status: true,
          });
@@ -83,6 +57,7 @@ const loginAdmin=async(req,resp,next)=>{
           name: usermail.name,
           email: usermail.email,
           contact: usermail.contact,
+          role:usermail.role
         },
         error: false,
         status: true,
@@ -104,33 +79,10 @@ const loginAdmin=async(req,resp,next)=>{
 const putAdmin=async(req,res)=>{
   try {
   const profilePic=req.file.filename
-    const name=req.body.name; 
-    const address=req.body.address; 
-       const contact=req.body.contact;
-       const email=req.body.email;
-        const gender=req.body.gender;
-         const dob=req.body.dob;
-         const qualification=req.body.qualification;
-       const degree=req.body.degree;
-       const exp=req.body.exp;
-       const password=req.body.password;
-      
-
+ const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role }=req.body
      let data = await AdminRegisterSchema.updateOne(
      {_id: req.params._id},
-      { $set:   {
-        name, 
-      address,
-      contact,
-      email,
-      gender,
-      dob,
-      qualification,
-      degree,
-      exp,
-      password,
-      profilePic    
-      } }
+      { $set:{ name,address,contact,email,gender,dob,qualification,degree,exp,password,profilePic, role } }
 
   );
        res.send(data);

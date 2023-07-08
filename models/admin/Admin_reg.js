@@ -46,6 +46,10 @@ const AdminRegisterSchema = new mongoose.Schema({
     profilePic:{
         type:String,
         default:"user.jfif" 
+    },
+     role:{
+        type:String,
+        default:12345 
     }
     
      
