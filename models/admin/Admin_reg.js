@@ -49,7 +49,7 @@ const AdminRegisterSchema = new mongoose.Schema({
     },
      role:{
         type:String,
-        default:12345 
+        default:0 
     }
     
      
