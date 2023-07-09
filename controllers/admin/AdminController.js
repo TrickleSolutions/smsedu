@@ -10,6 +10,7 @@ const CategorySchema=require('../../models/admin/category')
 const InstructorOfMonthSchema=require('../../models/admin/instructorofmonth')
 const Student_RegisterSchema=require('../../models/students/StudentModel')
 const AppointmentSchema=require('../../models/admin/Appointment')
+const rolesPermissionSchema=require('../../models/admin/permission')
 const createAdmin=async(req,resp)=>{
     try { 
         
@@ -874,8 +875,67 @@ const getSingleAppointment=async(req,res)=>{
     console.log(err);
   }
 }
+const createrolepermission=async(req,resp)=>{
+  try { 
+      
+    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission }=req.body
+       let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
+      
+     let result=  await data.save();
+   
+ 
+        resp.send(result)
+     
+   } catch (err) {
+     console.log(err);
+   }
+}
+
+const getrolepermission=async(req,res)=>{
+
+  let data = await rolesPermissionSchema.find( );
+
+  res.send(data);
+}
+const getSinglerolepermission=async(req,res)=>{
+
+  let data = await rolesPermissionSchema.find({id:req.params.id});
+
+  res.send(data);
+}
+const deleterolepermission= async (req, resp) => {
+try {
+  console.log(req.params);
+  let data = await rolesPermissionSchema.deleteOne({_id:req.params._id});
+  resp.send(data);
+} catch (err) {
+  console.log(err);
+}
+}
+const putrolepermission=async(req,res)=>{
+  try {
+    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission }=req.body
+     let data = await rolesPermissionSchema .updateOne(
+      {_id:req.params._id},
+      { $set:{ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission } } 
+  );
+       res.send(data);
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
+
 
 module.exports={ 
+
+  createrolepermission,
+  getrolepermission,
+  getSinglerolepermission,
+  deleterolepermission,
+  putrolepermission,
+
+
   
   createAppointment ,
   putAppointment    ,

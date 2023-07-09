@@ -59,7 +59,15 @@ const {
              putAppointment    ,
              getAppointment ,
              getSingleAppointment,
-             deleteAppointment
+             deleteAppointment,
+
+
+    createrolepermission,
+  getrolepermission,
+  getSinglerolepermission,
+  deleterolepermission,
+  putrolepermission,
+
 
       }=require('../../controllers/admin/AdminController')
 const course_upload=require('../../multer/admin/course_upload')
@@ -67,6 +75,12 @@ const studentofmonth_upload=require('../../multer/admin/StudentOfMonth')
 const instructorofmonth_upload=require('../../multer/admin/Instructorofmonth')
 const instructorProfile=require('../../multer/admin/InsructorProfile')
 const  Admin_upload=require('../../multer/admin/Amin_upload')
+///role permission section 
+Router.route('/permission/:_id').put(putrolepermission);
+Router.route('/permission/:_id').delete(deleterolepermission); 
+Router.route('/permission/:id').get(getSinglerolepermission); 
+Router.route('/permission').post( createrolepermission);
+Router.route('/permission').get(getrolepermission)
 ///appointment
 Router.route('/appoint/:_id').put(putAppointment);
 Router.route('/appoint/:_id').delete(deleteAppointment); 
