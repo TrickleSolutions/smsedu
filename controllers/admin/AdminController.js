@@ -116,7 +116,7 @@ const getAdmin=async(req,res,next)=>{
 const deleteAdmin= async (req, resp) => {
   try {
     console.log(req.params.contact);
-    let data = await AdminRegisterSchema.deleteOne({contact:req.params.contact});
+    let data = await AdminRegisterSchema.deleteOne({_id:req.params._id});
     resp.send(data);
   } catch (err) {
     console.log(err);
