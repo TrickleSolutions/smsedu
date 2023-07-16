@@ -115,7 +115,7 @@ const getAdmin=async(req,res,next)=>{
 
 const deleteAdmin= async (req, resp) => {
   try {
-    console.log(req.params.contact);
+   // console.log(req.params.contact);
     let data = await AdminRegisterSchema.deleteOne({_id:req.params._id});
     resp.send(data);
   } catch (err) {
@@ -879,13 +879,30 @@ const createrolepermission=async(req,resp)=>{
   try { 
       
     const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission }=req.body
-       let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
-      
-     let result=  await data.save();
-   
- 
-        resp.send(result)
-     
+      //  let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
+      //   let result=  await data.save(); 
+      //   resp.send(result) 
+      const usermail = await rolesPermissionSchema.findOne({ id: id });
+      console.log(usermail);
+      if (usermail) {
+        resp.status(404).json({
+          code: 404,
+          message: "Permission  aleready exist....  ",
+          data: [],
+          error: false,
+          status: false,
+        });
+      } else {
+        let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
+           await data.save();  
+        resp.status(200).json({
+          code: 200,
+          message: "Permission allotted successfully", 
+          error: false,
+          status: true,
+        });
+      }
+
    } catch (err) {
      console.log(err);
    }
