@@ -137,7 +137,7 @@ const createInstructor=async(req,resp)=>{
      const degree=req.body.degree;
      const exp=req.body.exp;
      const password=req.body.password;
-   
+     const status=req.body.status;
       
      const usermail = await InstructorRegisterSchema.findOne({ email: email });
      console.log(usermail);
@@ -161,7 +161,8 @@ const createInstructor=async(req,resp)=>{
     qualification,
     degree,
     exp,
-    password
+    password,
+    status
        });
       
        let result = await data.save();
@@ -193,7 +194,7 @@ try {
      const exp=req.body.exp;
      const password=req.body.password;
      const profilePic=req.file.filename;
-    
+     const status=req.body.status;
 
    let data = await InstructorRegisterSchema.updateOne(
    {_id: req.params._id},
@@ -208,7 +209,8 @@ try {
     degree,
     exp,
     password,
-    profilePic
+    profilePic,
+    status
       
     } }
 
