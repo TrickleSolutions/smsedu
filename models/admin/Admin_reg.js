@@ -47,10 +47,14 @@ const AdminRegisterSchema = new mongoose.Schema({
         type:String,
         default:"user.jfif" 
     },
-     role:{
-        type:String,
-        default:0 
-    }
+    role:{
+       type:String,
+       default:0 
+   },
+   status:{
+      type:String,
+      default:"active" 
+  }
     
      
 });

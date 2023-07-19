@@ -42,7 +42,11 @@ const CourseSchema = new mongoose.Schema({
       instructor: {
         type: String,
         required: true,
-      }
+      } ,
+      status:{
+        type:String,
+        default:"active"
+    }
      
     
 }); 

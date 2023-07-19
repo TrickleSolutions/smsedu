@@ -14,7 +14,7 @@ const rolesPermissionSchema=require('../../models/admin/permission')
 const createAdmin=async(req,resp)=>{
     try { 
         
-        const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role }=req.body
+        const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role,status }=req.body
      
         
        const usermail = await AdminRegisterSchema.findOne({ email: email });
@@ -28,7 +28,7 @@ const createAdmin=async(req,resp)=>{
            status: false,
          });
        } else {
-         let data = new AdminRegisterSchema( { name,address,contact,email,gender,dob,qualification,degree,exp,password, role });
+         let data = new AdminRegisterSchema( { name,address,contact,email,gender,dob,qualification,degree,exp,password, role,status });
           await data.save(); 
          resp.status(200).json({
            code: 200,
@@ -80,10 +80,10 @@ const loginAdmin=async(req,resp,next)=>{
 const putAdmin=async(req,res)=>{
   try {
   const profilePic=req.file.filename
- const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role }=req.body
+ const { name,address,contact,email,gender,dob,qualification,degree,exp,password, role,status }=req.body
      let data = await AdminRegisterSchema.updateOne(
      {_id: req.params._id},
-      { $set:{ name,address,contact,email,gender,dob,qualification,degree,exp,password,profilePic, role } }
+      { $set:{ name,address,contact,email,gender,dob,qualification,degree,exp,password,profilePic, role,status } }
 
   );
        res.send(data);
@@ -254,6 +254,7 @@ const createCourse= async(req,resp)=>{
     let rating = req.body.rating;
     let category = req.body.category;
     let instructor = req.body.instructor;
+    let status = req.body.status; 
    
       
      const usermail = await CourseSchema.findOne({ title: title });
@@ -278,7 +279,8 @@ const createCourse= async(req,resp)=>{
         price,
         rating
         , category,
-        instructor
+        instructor,
+        status
        });
       
        let result = await data.save();
@@ -310,7 +312,7 @@ const putCourse=async(req,res)=>{
     let rating = req.body.rating;
     let category = req.body.category;
     let instructor = req.body.instructor;
-
+    let status = req.body.status; 
      let data = await CourseSchema.updateOne(
      {_id: req.params._id},
       { $set:   {
@@ -324,7 +326,8 @@ const putCourse=async(req,res)=>{
         price,
         rating,
         category,
-        instructor
+        instructor,
+        status
 
       } }
 

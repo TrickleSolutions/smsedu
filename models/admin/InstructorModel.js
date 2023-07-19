@@ -47,6 +47,10 @@ const InstructorRegisterSchema = new mongoose.Schema({
     profilePic:{
         type:String,
         default:"user.jfif"
+    },
+    status:{
+        type:String,
+        default:"active"
     }
 });
 
