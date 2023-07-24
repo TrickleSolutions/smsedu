@@ -12,6 +12,7 @@ const Student_RegisterSchema=require('../../models/students/StudentModel')
 const AppointmentSchema=require('../../models/admin/Appointment')
 const rolesPermissionSchema=require('../../models/admin/permission')
 const  ContactSchema=require('../../models/admin/contactform')
+const JoinInstructorSchema=require('../../models/admin/joinasinstructor')
 const createAdmin=async(req,resp)=>{
     try { 
         
@@ -1014,7 +1015,62 @@ const putContact=async(req,res)=>{
  
 }
 
+
+const createJoinAsInstructor=async(req,res)=>{ 
+  const  {name,email,contact ,qualification,exp }=req.body
+  const cv=req.file.filename;
+  let data = new JoinInstructorSchema({name,email,contact ,qualification,exp,cv }); 
+ let result = await data.save();
+ res.status(200).json({
+   code: 200,
+   message: " Request Generated successfully", 
+   error: false,
+   status: true,
+ });
+
+}
+const getJoinAsInstructor=async(req,res)=>{
+  let data = await JoinInstructorSchema.find(); 
+  res.send(data); 
+}
+const getSingleJoinAsInstructor=async(req,res)=>{
+  let data = await JoinInstructorSchema.find({_id:req.params._id})  
+  res.send(data); 
+}
+
+const putJoinAsInstructor=async(req,res)=>{
+  try {
+     const cv=req.file.filename
+   const{name,email,contact ,qualification,exp }=req.body
+     let data = await JoinInstructorSchema.updateOne(
+      {_id:req.params._id},
+      { $set:  {name,email,contact ,qualification,exp,cv } }
+
+  );
+       res.send(data);
+
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
+const delJoinAsInstructor=async(req,res)=>{
+  try {
+      console.log(req.params)
+      let data = await JoinInstructorSchema.deleteOne( {_id:req.params._id});
+      res.send(data);
+  } catch (err) {
+      console.log(err)
+
+  }
+ 
+}
 module.exports={ 
+  createJoinAsInstructor,
+  getJoinAsInstructor,
+  getSingleJoinAsInstructor,
+  putJoinAsInstructor,
+  delJoinAsInstructor,
     createContact,
   getContact,
   getSingleContact,

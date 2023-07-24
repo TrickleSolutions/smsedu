@@ -73,6 +73,12 @@ const {
   deleteContact,
   putContact,
 
+  createJoinAsInstructor,
+  getJoinAsInstructor,
+  getSingleJoinAsInstructor,
+  putJoinAsInstructor,
+  delJoinAsInstructor,
+
 
       }=require('../../controllers/admin/AdminController')
 const course_upload=require('../../multer/admin/course_upload')
@@ -80,6 +86,15 @@ const studentofmonth_upload=require('../../multer/admin/StudentOfMonth')
 const instructorofmonth_upload=require('../../multer/admin/Instructorofmonth')
 const instructorProfile=require('../../multer/admin/InsructorProfile')
 const  Admin_upload=require('../../multer/admin/Amin_upload')
+const joininstructor_upload=require('../../multer/admin/joininstructor_upload')
+
+
+Router.route('/joininstructor').post(joininstructor_upload.single('cv'),createJoinAsInstructor);
+Router.route('/joininstructor').get(getJoinAsInstructor);
+Router.route('/joininstructor/:_id').get(getSingleJoinAsInstructor);
+Router.route('/joininstructor/:_id').delete(delJoinAsInstructor);
+Router.route('/joininstructor/:_id').put(joininstructor_upload.single('cv'), putJoinAsInstructor,);
+
 ///role permission section 
 Router.route('/permission/:_id').put(putrolepermission);
 Router.route('/permission/:_id').delete(deleterolepermission); 
@@ -93,11 +108,7 @@ Router.route('/appoint/:_id').get(getSingleAppointment);
 Router.route('/appoint').post( createAppointment);
 Router.route('/appoint').get(getAppointment)
 
-//contactform createContact,
-  getContact,
-  getSingleContact,
-  deleteContact,
-  putContact,
+ //contact form
 Router.route('/contact/:_id').put(putContact);
 Router.route('/contact/:_id').delete(deleteContact); 
 Router.route('/contact/:_id').get(getSingleContact); 
@@ -143,6 +154,7 @@ Router.route('/instructor').get(getInstructor);
 Router.route('/instructor/:_id').delete(deleteInstructor);
 Router.route('/instructor/:_id').put(instructorProfile.single('profilePic'),putInstructor);
 Router.route('/instructor/:_id').get(getSingleInstructor);
+
 Router.route('/course').post(course_upload.single('img'),createCourse);
 Router.route('/course').get(getCourse);
 Router.route('/course/:_id').get(getSingleCourse);
