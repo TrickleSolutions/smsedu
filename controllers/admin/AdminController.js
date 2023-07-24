@@ -950,21 +950,8 @@ const putrolepermission=async(req,res)=>{
  
 }
 const createContact=async(req,resp)=>{
-  try { 
-      
-    const {name,email,contact,subject,desc}=req.body
-       
-      const usermail = await ContactSchema.findOne({ contact: contact });
-      console.log(usermail);
-      if (usermail) {
-        resp.status(404).json({
-          code: 404,
-          message: "Mobile aleready exist....  ",
-          data: [],
-          error: false,
-          status: false,
-        });
-      } else {
+  try {  
+    const {name,email,contact,subject,desc}=req.body 
         let data = new ContactSchema({name,email,contact,subject,desc});
            await data.save();  
         resp.status(200).json({
@@ -972,9 +959,7 @@ const createContact=async(req,resp)=>{
           message: "Register Contact form successfully", 
           error: false,
           status: true,
-        });
-      }
-
+        }); 
    } catch (err) {
      console.log(err);
    }
