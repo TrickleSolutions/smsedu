@@ -121,9 +121,11 @@ const getsingleSt=async(req,res)=>{
       admdate: data[0].admdate,
       refby: data[0].refby,
       password: data[0].password,
-      profilePic: data[0].profilePic,
-
-    
+      profilePic: data[0].profilePic, 
+     status :data[0].status,
+    course:data[0].course ,
+    shift:data[0].shift ,   
+    locker_no:data[0].locker_no ,
   });
 }
 const putSt=async(req,res)=>{

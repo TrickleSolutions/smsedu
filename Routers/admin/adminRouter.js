@@ -67,6 +67,11 @@ const {
   getSinglerolepermission,
   deleterolepermission,
   putrolepermission,
+  createContact,
+  getContact,
+  getSingleContact,
+  deleteContact,
+  putContact,
 
 
       }=require('../../controllers/admin/AdminController')
@@ -88,6 +93,16 @@ Router.route('/appoint/:_id').get(getSingleAppointment);
 Router.route('/appoint').post( createAppointment);
 Router.route('/appoint').get(getAppointment)
 
+//contactform createContact,
+  getContact,
+  getSingleContact,
+  deleteContact,
+  putContact,
+Router.route('/contact/:_id').put(putContact);
+Router.route('/contact/:_id').delete(deleteContact); 
+Router.route('/contact/:_id').get(getSingleContact); 
+Router.route('/contact').post( createContact);
+Router.route('/contact').get(getContact)
 //Admin 
 Router.route('/admin').post(createAdmin);
 Router.route('/adminlogin').post(loginAdmin);

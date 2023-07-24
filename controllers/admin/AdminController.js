@@ -11,6 +11,7 @@ const InstructorOfMonthSchema=require('../../models/admin/instructorofmonth')
 const Student_RegisterSchema=require('../../models/students/StudentModel')
 const AppointmentSchema=require('../../models/admin/Appointment')
 const rolesPermissionSchema=require('../../models/admin/permission')
+const  ContactSchema=require('../../models/admin/contactform')
 const createAdmin=async(req,resp)=>{
     try { 
         
@@ -947,9 +948,78 @@ const putrolepermission=async(req,res)=>{
    }
  
 }
+const createContact=async(req,resp)=>{
+  try { 
+      
+    const {name,email,contact,subject,desc}=req.body
+       
+      const usermail = await ContactSchema.findOne({ contact: contact });
+      console.log(usermail);
+      if (usermail) {
+        resp.status(404).json({
+          code: 404,
+          message: "Mobile aleready exist....  ",
+          data: [],
+          error: false,
+          status: false,
+        });
+      } else {
+        let data = new ContactSchema({name,email,contact,subject,desc});
+           await data.save();  
+        resp.status(200).json({
+          code: 200,
+          message: "Register Contact form successfully", 
+          error: false,
+          status: true,
+        });
+      }
 
+   } catch (err) {
+     console.log(err);
+   }
+}
+
+const getContact=async(req,res)=>{
+
+  let data = await ContactSchema.find( );
+
+  res.send(data);
+}
+const getSingleContact=async(req,res)=>{
+
+  let data = await ContactSchema.find({id:req.params.id});
+
+  res.send(data);
+}
+const deleteContact= async (req, resp) => {
+try {
+  console.log(req.params);
+  let data = await ContactSchema.deleteOne({_id:req.params._id});
+  resp.send(data);
+} catch (err) {
+  console.log(err);
+}
+}
+const putContact=async(req,res)=>{
+  try {
+    const {name,email,contact,subject,desc}=req.body
+     let data = await ContactSchema .updateOne(
+      {_id:req.params._id},
+      { $set:{name,email,contact,subject,desc} } 
+  );
+       res.send(data);
+   } catch (err) {
+       console.log(err)
+   }
+ 
+}
 
 module.exports={ 
+    createContact,
+  getContact,
+  getSingleContact,
+  deleteContact,
+  putContact,
 
   createrolepermission,
   getrolepermission,
