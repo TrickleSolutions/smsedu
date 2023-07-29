@@ -885,7 +885,7 @@ const getSingleAppointment=async(req,res)=>{
 const createrolepermission=async(req,resp)=>{
   try { 
       
-    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission }=req.body
+    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission,joinInstructor,contact }=req.body
       //  let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
       //   let result=  await data.save(); 
       //   resp.send(result) 
@@ -900,7 +900,7 @@ const createrolepermission=async(req,resp)=>{
           status: false,
         });
       } else {
-        let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission });
+        let data = new rolesPermissionSchema({ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission ,joinInstructor,contact});
            await data.save();  
         resp.status(200).json({
           code: 200,
@@ -938,10 +938,10 @@ try {
 }
 const putrolepermission=async(req,res)=>{
   try {
-    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission }=req.body
+    const { id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission,joinInstructor,contact }=req.body
      let data = await rolesPermissionSchema .updateOne(
       {_id:req.params._id},
-      { $set:{ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission } } 
+      { $set:{ id,enquiries,courseList,categories,studentList,instructorList,cashLedger,fees,scheduleClasses,events,manageStudent,scheduleBatches,monthlyAchievers,rolesPermission,joinInstructor,contact } } 
   );
        res.send(data);
    } catch (err) {

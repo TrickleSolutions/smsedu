@@ -29,6 +29,7 @@ app.use("/api/teacherpic", express.static("./assets/admin/instructorProfile", { 
 app.use("/api/adminpic", express.static("./assets/admin/anminprofile", { maxAge }));
 app.use("/api/studentofmonth", express.static("./assets/admin/studentofmonth", { maxAge }));
 app.use("/api/instructorofmonths", express.static("./assets/admin/instructorofmonth", { maxAge }));
+app.use("/api/showcontactcv", express.static("./assets/admin/joinasinstructor", { maxAge }));
 
  
 
