@@ -1,20 +1,21 @@
-const express=require('express'); 
-const app=express();
-const bodyParser=require("body-parser");
-const cors=require('cors');
- 
-const PORT=process.env.PORT || 8000;
-const   adminRouter=require('./Routers/admin/adminRouter')
-const  StudentRoute=require('./Routers/students/StudentRoute');
-const  TeacherRoute=require('./Routers/teachers/TeacherRoute');
-app.use(bodyParser.json()); 
+const express = require('express');
+const app = express();
+const bodyParser = require("body-parser");
+const cors = require('cors');
+
+const PORT = process.env.PORT || 8000;
+const adminRouter = require('./Routers/admin/adminRouter')
+const StudentRoute = require('./Routers/students/StudentRoute');
+const TeacherRoute = require('./Routers/teachers/TeacherRoute');
+app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors()
-        ) ;
-require('./config/config'); 
-app.use("/api",adminRouter);    
-app.use('/api',StudentRoute);
-app.use('/api',TeacherRoute);
+app.use(cors({
+    origin: ["https://www.smseducations.com", "http://localhost:3000", 'http://localhost:3001', 'https://smseducations.com']
+}));
+require('./config/config');
+app.use("/api", adminRouter);
+app.use('/api', StudentRoute);
+app.use('/api', TeacherRoute);
 const oneYearInSeconds = 365 * 24 * 60 * 60;
 const maxAge = oneYearInSeconds * 1000;
 
@@ -31,7 +32,7 @@ app.use("/api/studentofmonth", express.static("./assets/admin/studentofmonth", {
 app.use("/api/instructorofmonths", express.static("./assets/admin/instructorofmonth", { maxAge }));
 app.use("/api/showcontactcv", express.static("./assets/admin/joinasinstructor", { maxAge }));
 
- 
+
 
 app.listen(PORT, () => {
     console.log("Hi Amit your server is running at  this :" + PORT)
