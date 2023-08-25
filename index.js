@@ -7,8 +7,17 @@ const PORT = process.env.PORT || 8000;
 const adminRouter = require('./Routers/admin/adminRouter')
 const StudentRoute = require('./Routers/students/StudentRoute');
 const TeacherRoute = require('./Routers/teachers/TeacherRoute');
+
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001'); // Replace with your front-end URL
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 app.use(bodyParser.json());
-app.use(express.json());
+app.use(express.json({ limit: '30mb' }));
 app.use(cors({
     origin: ["https://www.smseducations.com", "http://localhost:3000", 'http://localhost:3001', 'https://smseducations.com']
 }));
