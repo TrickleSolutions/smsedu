@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const SendOtpRoute= require('./Routers/sendotproutes')
 const bodyParser = require("body-parser");
 const cors = require('cors');
 
@@ -15,11 +16,15 @@ app.use(cors({
     origin: ["https://www.smseducations.com", "http://localhost:3000", 'http://localhost:3001', 'https://smseducations.com']
 }));
 require('./config/config');
+const oneYearInSeconds = 365 * 24 * 60 * 60;
+const maxAge = oneYearInSeconds * 1000;
+
+
+
 app.use("/api", adminRouter);
 app.use('/api', StudentRoute);
 app.use('/api', TeacherRoute);
-const oneYearInSeconds = 365 * 24 * 60 * 60;
-const maxAge = oneYearInSeconds * 1000;
+app.use('/api', SendOtpRoute);
 
 app.use("/api/coursepic", express.static("./assets/admin/course_upload", { maxAge }));
 app.use("/api/assignmentpic", express.static("./assets/teachers/assignment_upload", { maxAge }));
