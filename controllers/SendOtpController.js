@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
             const isReqStored = await new VerifyModel({
                 otp: otp,
                 otpid: response.data,
-                otpExpireTime: Date.now() + 300000,
+                otpExpireTime: Date.now() + 40000,
             }).save();
             if (!isReqStored) {
                 return res.status(400).json({ error: true, message: "Failed to send OTP" });

@@ -100,10 +100,15 @@ const createSt = async (req, resp, next) => {
 //   }
 // }
 
-const loginSt = async (req, res, next) => {
+const loginSt = async (req, res) => {
   const { contact, otp, otpid } = req.query;
 
   try {
+    if (!contact || !otp || !otpid) return res.status(400).json({ error: true, message: "invalid credentials" })
+
+    // find the user 
+    const isUser = await Student_RegisterSchema.findOne({ contact: contact })
+    if (!isUser) return res.status(404).json({ error: true, message: "No user found" })
     // Verify the OTP 
     const verifiedOtp = await VerifyModel.findOne({
       otp: otp,
@@ -115,14 +120,8 @@ const loginSt = async (req, res, next) => {
       return res.status(404).json({ error: true, message: "Invalid OTP or OTP expired" });
     }
 
-    // Find the user based on the contact
-    const user = await Student_RegisterSchema.findOne({ contact: contact });
 
-    if (!user) {
-      return res.status(404).json({ error: true, message: 'User not found' });
-    }
-
-    res.status(200).json({ error: false, data: user });
+    res.status(200).json({ error: false, data: isUser });
   } catch (error) {
     // Handle any errors that occur during the process
     console.error("Error during login:", error);
