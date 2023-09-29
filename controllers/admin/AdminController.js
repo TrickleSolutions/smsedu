@@ -202,6 +202,7 @@ const createInstructor = async (req, resp) => {
     const dob = req.body.dob;
     const qualification = req.body.qualification;
     const degree = req.body.degree;
+    const salary = req.body.salary;
     const exp = req.body.exp;
     const password = req.body.password;
     const status = req.body.status;
@@ -227,6 +228,7 @@ const createInstructor = async (req, resp) => {
         dob,
         qualification,
         degree,
+        salary,
         exp,
         password,
         status,
