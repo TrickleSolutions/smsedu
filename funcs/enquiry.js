@@ -11,7 +11,7 @@ const generateEnquiryNo = async () => {
   if (!SeqData) {
     SeqData = await new EnquiryNo({
       id: "EN",
-      seq: 1995,
+      seq: 2100,
     }).save();
   }
   SeqData.seq++;
