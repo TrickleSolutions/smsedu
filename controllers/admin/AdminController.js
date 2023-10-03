@@ -13,6 +13,7 @@ const AppointmentSchema = require("../../models/admin/Appointment");
 const rolesPermissionSchema = require("../../models/admin/permission");
 const ContactSchema = require("../../models/admin/contactform");
 const JoinInstructorSchema = require("../../models/admin/joinasinstructor");
+const generateEnquiryNo = require("../../funcs/enquiry");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -447,7 +448,10 @@ const createEnquiry = async (req, resp) => {
         status: false,
       });
     } else {
+      // generate the enquiry id
+      const EnquiryId = await generateEnquiryNo();
       let data = new Enquiry_adminSchema({
+        enquiryNo: EnquiryId,
         name,
         fname,
         address,
@@ -461,7 +465,7 @@ const createEnquiry = async (req, resp) => {
         note,
       });
 
-      let result = await data.save();
+      await data.save();
 
       resp.status(200).json({
         code: 200,

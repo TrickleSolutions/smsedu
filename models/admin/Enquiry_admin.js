@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const Enquiry_adminSchema = new mongoose.Schema(
   {
+    enquiryNo: {
+      type: String,
+    },
     name: {
       type: String,
       // required: true,
