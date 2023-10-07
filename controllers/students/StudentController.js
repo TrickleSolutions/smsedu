@@ -1,28 +1,19 @@
 const Student_RegisterSchema = require("../../models/students/StudentModel");
-const crypto = require('crypto');
-const Functions = require('../../library/functions');
-const upload_task = require('../../models/students/uploadTask')
+const crypto = require("crypto");
+const Functions = require("../../library/functions");
+const upload_task = require("../../models/students/uploadTask");
 const nodemailer = require("nodemailer");
-const EnrollCourseSchema = require('../../models/students/EnrollCourse')
-const InstructorRegisterSchema = require('../../models/admin/InstructorModel')
-const CourseSchema = require('../../models/admin/Add_Course');
+const EnrollCourseSchema = require("../../models/students/EnrollCourse");
+const InstructorRegisterSchema = require("../../models/admin/InstructorModel");
+const CourseSchema = require("../../models/admin/Add_Course");
 const VerifyModel = require("../../models/VerifyModel");
 const createSt = async (req, resp, next) => {
   try {
-    const regno = req.body.regno;
-    const name = req.body.name;
-    const fname = req.body.fname;
-    const address = req.body.address;
-    const contact = req.body.contact;
-    const email = req.body.email;
-    const gender = req.body.gender;
-    const dob = req.body.dob;
-    const admdate = req.body.admdate;
-    const refby = req.body.refby;
-    const password = req.body.password;
-    const { status, course, shift, locker_no } = req.body
+    const formData = req.body;
 
-    const usermail = await Student_RegisterSchema.findOne({ email: email });
+    const usermail = await Student_RegisterSchema.findOne({
+      email: formData.email,
+    });
     console.log(usermail);
     if (usermail) {
       resp.status(404).json({
@@ -33,25 +24,12 @@ const createSt = async (req, resp, next) => {
         status: false,
       });
     } else {
-      let data = new Student_RegisterSchema({
-        regno,
-        name,
-        fname,
-        address,
-        contact,
-        email,
-        gender,
-        dob,
-        admdate,
-        refby,
-        password,
-        status, course, shift, locker_no
-      });
+      let data = new Student_RegisterSchema(formData);
       //  const token=await data.generatAuthToken()
       //    console.log(token)
-      let result = await data.save();
+      await data.save();
       //resp.send(result);
-
+ 
       resp.status(200).json({
         code: 200,
         message: "user  Register successfully",
@@ -63,7 +41,7 @@ const createSt = async (req, resp, next) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 // const loginSt = async (req, resp, next) => {
 //   try {
 //     const email = req.body.email;
@@ -104,12 +82,16 @@ const loginSt = async (req, res) => {
   const { contact, otp, otpid } = req.query;
 
   try {
-    if (!contact || !otp || !otpid) return res.status(400).json({ error: true, message: "invalid credentials" })
+    if (!contact || !otp || !otpid)
+      return res
+        .status(400)
+        .json({ error: true, message: "invalid credentials" });
 
-    // find the user 
-    const isUser = await Student_RegisterSchema.findOne({ contact: contact })
-    if (!isUser) return res.status(404).json({ error: true, message: "No user found" })
-    // Verify the OTP 
+    // find the user
+    const isUser = await Student_RegisterSchema.findOne({ contact: contact });
+    if (!isUser)
+      return res.status(404).json({ error: true, message: "No user found" });
+    // Verify the OTP
     const verifiedOtp = await VerifyModel.findOne({
       otp: otp,
       otpid: otpid,
@@ -117,24 +99,26 @@ const loginSt = async (req, res) => {
     });
 
     if (!verifiedOtp) {
-      return res.status(404).json({ error: true, message: "Invalid OTP or OTP expired" });
+      return res
+        .status(404)
+        .json({ error: true, message: "Invalid OTP or OTP expired" });
     }
-
 
     res.status(200).json({ error: false, data: isUser });
   } catch (error) {
     // Handle any errors that occur during the process
     console.error("Error during login:", error);
-    res.status(500).json({ error: true, message: "An error occurred during login" });
+    res
+      .status(500)
+      .json({ error: true, message: "An error occurred during login" });
   }
-}
+};
 
 const getSt = async (req, res) => {
   let data = await Student_RegisterSchema.find();
 
   res.send(data);
-
-}
+};
 const getsingleSt = async (req, res) => {
   try {
     const studentId = req.params._id; // Use the correct parameter name
@@ -142,7 +126,7 @@ const getsingleSt = async (req, res) => {
     const data = await Student_RegisterSchema.findById(studentId);
 
     if (!data) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
 
     const {
@@ -185,40 +169,69 @@ const getsingleSt = async (req, res) => {
       locker_no,
     });
   } catch (error) {
-    console.error('Error fetching student data:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching student data:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const putSt = async (req, res) => {
   try {
     const profilePic = req.file.filename;
-    console.log(profilePic)
-    const { regno, name, fname, address, contact, email, gender, dob, admdate, refby, password, status, course, shift, locker_no } = req.body
+    console.log(profilePic);
+    const {
+      regno,
+      name,
+      fname,
+      address,
+      contact,
+      email,
+      gender,
+      dob,
+      admdate,
+      refby,
+      password,
+      status,
+      course,
+      shift,
+      locker_no,
+    } = req.body;
     let data = await Student_RegisterSchema.updateOne(
       { _id: req.params._id },
-      { $set: { regno, name, fname, address, contact, email, gender, dob, admdate, refby, password, profilePic, status, course, shift, locker_no } }
-
+      {
+        $set: {
+          regno,
+          name,
+          fname,
+          address,
+          contact,
+          email,
+          gender,
+          dob,
+          admdate,
+          refby,
+          password,
+          profilePic,
+          status,
+          course,
+          shift,
+          locker_no,
+        },
+      }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const delSt = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     let data = await Student_RegisterSchema.deleteOne({ _id: req.params._id });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
-
-}
+};
 const sendforgetPass = (req, res) => {
   try {
     const email = req.body.email;
@@ -226,44 +239,44 @@ const sendforgetPass = (req, res) => {
       email: email,
     });
     if (usermail) {
-
       // const email = "amitpoly2020@gmail.com";
       //const _id=req.body._id;
-      const _id = '464gdgr55654645645645'
+      const _id = "464gdgr55654645645645";
 
       crypto.randomBytes(64, function (err, buffer) {
-        let token = buffer.toString('hex');
+        let token = buffer.toString("hex");
         let timeStamp = Functions.getTimeStamp(Date.now());
 
         const transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
+          host: "smtp.gmail.com",
           port: 587,
           secure: false,
           auth: {
-            user: 'amitpoly2020@gmail.com',
-            pass: 'tnipzxxgahbeznwp'
-          }
+            user: "amitpoly2020@gmail.com",
+            pass: "tnipzxxgahbeznwp",
+          },
         });
 
         (() => {
-
           const mailOptions = {
-            from: 'amitpoly2020@gmail.com', // sender 
+            from: "amitpoly2020@gmail.com", // sender
             to: `${email}`, // list of receivers
             subject: `SMS Education reset password link`,
             text: ``,
             ///  html: "<p> click the link below for Reset your password <a href='http://postmortemshala.co.in/reset/password/" + token + "'> click here,</a></p>"
-            html: "<p> click the link   for Reset your password <a href='https://coaching-institute.netlify.app'> click here,</a></p>"
-          }
+            html: "<p> click the link   for Reset your password <a href='https://coaching-institute.netlify.app'> click here,</a></p>",
+          };
 
           const result = transporter
             .sendMail(mailOptions)
             .then((log) => {
               Student_RegisterSchema.updateOne(
                 { email: req.body.email },
-                { $set: { token: token } }, { upsert: true }).then((result, err) => {
-                  console.log("tocken add successully")
-                })
+                { $set: { token: token } },
+                { upsert: true }
+              ).then((result, err) => {
+                console.log("tocken add successully");
+              });
               res.status(200).json({
                 code: 200,
                 status: true,
@@ -273,9 +286,8 @@ const sendforgetPass = (req, res) => {
                   messageInfo: log,
                   sendTimestamp: timeStamp,
                   token: token,
-                }
+                },
               });
-
             })
             .catch((error) => {
               res.status(404).json({
@@ -283,22 +295,18 @@ const sendforgetPass = (req, res) => {
                 status: false,
                 message: "Mail Sent Error !!",
                 error: error,
-                data: []
+                data: [],
               });
             });
-
         })();
       });
-
-    }
-    else {
-      res.send("Something went Wrong ! Email not found")
+    } else {
+      res.send("Something went Wrong ! Email not found");
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 
 const stChangepass = async (req, resp) => {
   try {
@@ -309,8 +317,7 @@ const stChangepass = async (req, resp) => {
         $set: {
           password: password,
         },
-      },
-
+      }
     );
     if (usermail) {
       resp.status(200).json({
@@ -326,9 +333,9 @@ const stChangepass = async (req, resp) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 const createuploadtask = async (req, res) => {
-  const { regno, name } = req.body
+  const { regno, name } = req.body;
   const img = req.file.filename;
   let data = new upload_task({ img, regno, name });
   let result = await data.save();
@@ -338,57 +345,49 @@ const createuploadtask = async (req, res) => {
     error: false,
     status: true,
   });
-
-}
+};
 const getuploadtask = async (req, res) => {
   let data = await upload_task.find();
 
   res.send(data);
-
-}
+};
 
 const putuploadtask = async (req, res) => {
   try {
-    const img = req.file.filename
-    const { regno, name } = req.body
+    const img = req.file.filename;
+    const { regno, name } = req.body;
     let data = await upload_task.updateOne(
       { regno: req.params.regno },
       {
         $set: {
           img,
           regno,
-          name
-
-        }
+          name,
+        },
       }
-
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const deluploadtask = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     let data = await upload_task.deleteOne({ regno: req.params.regno });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
-
-}
+};
 
 const createEnrollCorses = async (req, res) => {
-  const { student, course, create_at } = req.body
+  const { student, course, create_at } = req.body;
   // let dat = await EnrollCourseSchema.find({course:course});
   //  if(dat){
   //   res.status(304).json({
   //     code: 304,
-  //     message: "You have already enrolled in this course..", 
+  //     message: "You have already enrolled in this course..",
   //     error: false,
   //     status: true,
   //   });
@@ -402,53 +401,58 @@ const createEnrollCorses = async (req, res) => {
     error: false,
     status: true,
   });
-}
-
+};
 
 //}
 const getEnrollCorses = async (req, res) => {
   let data = await EnrollCourseSchema.find();
 
   res.send(data);
-
-}
+};
 const getSingleEnrollCorses = async (req, res) => {
   let data = await EnrollCourseSchema.find({ student: req.params.student });
 
   res.send(data);
-
-}
+};
 const putEnrollCorses = async (req, res) => {
   try {
-    const { student, course, create_at } = req.body
+    const { student, course, create_at } = req.body;
     let data = await EnrollCourseSchema.updateOne(
       { _id: req.params._id },
       { $set: { student, course, create_at } }
-
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const delEnrollCorses = async (req, res) => {
   try {
     //console.log(req.params)
     let data = await EnrollCourseSchema.deleteOne({ _id: req.params._id });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
-
-}
+};
 
 module.exports = {
   createSt,
-  createEnrollCorses, getEnrollCorses, getSingleEnrollCorses, putEnrollCorses, delEnrollCorses,
+  createEnrollCorses,
+  getEnrollCorses,
+  getSingleEnrollCorses,
+  putEnrollCorses,
+  delEnrollCorses,
 
-  createuploadtask, getuploadtask, deluploadtask, putuploadtask, getsingleSt,
-  sendforgetPass, stChangepass, loginSt, getSt, putSt, delSt,
-}
+  createuploadtask,
+  getuploadtask,
+  deluploadtask,
+  putuploadtask,
+  getsingleSt,
+  sendforgetPass,
+  stChangepass,
+  loginSt,
+  getSt,
+  putSt,
+  delSt,
+};

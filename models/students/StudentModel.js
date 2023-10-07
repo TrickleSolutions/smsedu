@@ -1,84 +1,90 @@
 const mongoose = require("mongoose");
-const Student_RegisterSchema = new mongoose.Schema({
-    regno:{
-        type:Number,
-       // required:true
+const Student_RegisterSchema = new mongoose.Schema(
+  {
+    regno: {
+      type: Number,
+      // required:true
     },
-    name:{
-        type:String,
-       // required:true
+    name: {
+      type: String,
+      // required:true
     },
-    fname:{
-        type:String,
+    fname: {
+      type: String,
       //  required:true
     },
-    address:{
-        type:String,
-       // required:true
+    address: {
+      type: String,
+      // required:true
     },
-    contact:{
-        type:Number,
+    contact: {
+      type: Number,
       //  required:true
     },
-    email:{
-        type:String,
-       // required:true
+    email: {
+      type: String,
+      // required:true
     },
-    gender:{
-        type:String,
-       // required:true
-    }, 
-    dob:{
-        type:String,
-       // required:true
+    gender: {
+      type: String,
+      // required:true
     },
-    admdate:{
-        type:String,
-       // required:true
+    dob: {
+      type: String,
+      // required:true
     },
-   
-    refby:{
-        type:String,
-       // required:false
+    admdate: {
+      type: String,
+      // required:true
     },
-    token:{
-        type:String,
-        
-    },
-    password:{
-        type:String,
-        default:12345
-        
-    },
-    profilePic:{
-        type:String,
-        default:"user.jfif"
-        
-    },
-     status:{
-        type:String,
-        default:"active"
-        
-    },
-    course:{
-        type:String,
-        required:false
-        
-    },
-    shift:{
-        type:String,
-        required:false
-        
-    },   
-    locker_no:{
-        type:Number,
-        default:0
-        
-    },
-    
-    
-});
 
+    refby: {
+      type: String,
+      // required:false
+    },
+    token: {
+      type: String,
+    },
+    password: {
+      type: String,
+      default: 12345,
+    },
+    profilePic: {
+      type: String,
+      default: "user.jfif",
+    },
+    idCardimg: {
+      type: String,
+      default: "user.jfif",
+    },
+    tenthMarksheet: {
+      type: String,
+      default: "user.jfif",
+    },
+    twelthMarksheet: {
+      type: String,
+      default: "user.jfif",
+    },
+    status: {
+      type: String,
+      default: "active",
+    },
+    course: {
+      type: String,
+      required: false,
+    },
+    shift: {
+      type: String,
+      required: false,
+    },
+    locker_no: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model('Student_Register',Student_RegisterSchema);
- 
+module.exports = mongoose.model("Student_Register", Student_RegisterSchema);

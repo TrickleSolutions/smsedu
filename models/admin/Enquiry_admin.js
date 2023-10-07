@@ -21,11 +21,9 @@ const Enquiry_adminSchema = new mongoose.Schema(
       type: String,
       //  required: true,
     },
-    epx_join: {
+    maritalStatus: {
       type: String,
-      //  required: true,
     },
-
     course: {
       type: String,
       //   required: true,
@@ -53,6 +51,21 @@ const Enquiry_adminSchema = new mongoose.Schema(
     note: {
       type: String,
       //  required:true
+    },
+    academicQualifications: {
+      type: String,
+    },
+    computerAwareness: {
+      type: String,
+    },
+    previousknowledge: {
+      type: String,
+    },
+    pdClasses: {
+      type: Boolean,
+    },
+    carrierClasses: {
+      type: Boolean,
     },
     status: {
       type: String,

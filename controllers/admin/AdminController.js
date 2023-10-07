@@ -423,21 +423,23 @@ const deleteCourse = async (req, resp) => {
 
 const createEnquiry = async (req, resp) => {
   try {
-    const {
-      name,
-      fname,
-      address,
-      dob,
-      epx_join,
-      course,
-      contact,
-      email,
-      gender,
-      counseller,
-      note,
-    } = req.body;
+    // const {
+    //   name,
+    //   fname,
+    //   address,
+    //   dob,
+    //   course,
+    //   contact,
+    //   email,
+    //   gender,
+    //   counseller,
+    //   note,
+    // } = req.body;
+    const formData = req.body;
 
-    const usermail = await Enquiry_adminSchema.findOne({ contact: contact });
+    const usermail = await Enquiry_adminSchema.findOne({
+      contact: formData.contact,
+    });
     console.log(usermail);
     if (usermail) {
       resp.status(404).json({
@@ -452,17 +454,7 @@ const createEnquiry = async (req, resp) => {
       const EnquiryId = await generateEnquiryNo();
       let data = new Enquiry_adminSchema({
         enquiryNo: EnquiryId,
-        name,
-        fname,
-        address,
-        dob,
-        epx_join,
-        course,
-        contact,
-        email,
-        gender,
-        counseller,
-        note,
+        ...formData,
       });
 
       await data.save();
@@ -481,39 +473,28 @@ const createEnquiry = async (req, resp) => {
 };
 const putEnquiry = async (req, res) => {
   try {
-    const {
-      name,
-      fname,
-      address,
-      dob,
-      epx_join,
-      course,
-      contact,
-      email,
-      gender,
-      counseller,
-      note,
-    } = req.body;
+    // const {
+    //   name,
+    //   fname,
+    //   address,
+    //   dob,
+    //   epx_join,
+    //   course,
+    //   contact,
+    //   email,
+    //   gender,
+    //   counseller,
+    //   note,
+    // } = req.body;
+    const formData = req.body;
 
     let data = await Enquiry_adminSchema.updateOne(
       { contact: req.params.contact },
       {
-        $set: {
-          name,
-          fname,
-          address,
-          dob,
-          epx_join,
-          course,
-          contact,
-          email,
-          gender,
-          counseller,
-          note,
-        },
+        $set: formData,
       }
     );
-    res.send(result);
+    res.send(data);
   } catch (err) {
     console.log(err);
   }
@@ -539,6 +520,7 @@ const deleteEnquiry = async (req, resp) => {
 const handleEnquiryStatus = async (req, res) => {
   const { status } = req.query;
   const { id } = req.params;
+  console.log(id, status);
 
   try {
     // find the enquiry
