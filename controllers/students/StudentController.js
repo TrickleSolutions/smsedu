@@ -161,7 +161,7 @@ const getsingleSt = async (req, res) => {
       gender,
       admdate,
       refby,
-      password, // Note: Sending password in response might not be secure, consider removing it.
+      password, 
       profilePic,
       status,
       course,
