@@ -115,10 +115,25 @@ const loginSt = async (req, res) => {
 };
 
 const getSt = async (req, res) => {
-  let data = await Student_RegisterSchema.find();
+  const page = req.query.page ? parseInt(req.query.page) : 1;
+  const limit = req.query.limit ? parseInt(req.query.limit) : 10;
 
-  res.send(data);
+  const skip = (page - 1) * limit;
+
+  try {
+    const totalDocuments = await Student_RegisterSchema.countDocuments({});
+    const data = await Student_RegisterSchema.find({}).skip(skip).limit(limit);
+
+    res.json({
+      data, 
+      currentPage: page,
+      totalPages: Math.ceil(totalDocuments / limit),
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
+
 const getsingleSt = async (req, res) => {
   try {
     const studentId = req.params._id; // Use the correct parameter name
