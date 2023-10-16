@@ -29,7 +29,7 @@ const createSt = async (req, resp, next) => {
       //    console.log(token)
       await data.save();
       //resp.send(result);
- 
+
       resp.status(200).json({
         code: 200,
         message: "user  Register successfully",
@@ -161,7 +161,7 @@ const getsingleSt = async (req, res) => {
       gender,
       admdate,
       refby,
-      password, 
+      password,
       profilePic,
       status,
       course,
@@ -176,8 +176,8 @@ const getsingleSt = async (req, res) => {
 
 const putSt = async (req, res) => {
   try {
-    const profilePic = req.file.filename;
-    console.log(profilePic);
+    // const profilePic = req.file.filename;
+    // console.log(profilePic);
     const {
       regno,
       name,
@@ -190,11 +190,13 @@ const putSt = async (req, res) => {
       admdate,
       refby,
       password,
+      profilePic,
       status,
       course,
       shift,
       locker_no,
     } = req.body;
+    console.log(regno, address);
     let data = await Student_RegisterSchema.updateOne(
       { _id: req.params._id },
       {
@@ -223,6 +225,24 @@ const putSt = async (req, res) => {
     console.log(err);
   }
 };
+
+const getUpdateStudent = async (req, res) => {
+  const data = req.body;
+  try {
+    const isUpdated = await Student_RegisterSchema.findByIdAndUpdate(
+      req.params._id,
+      { ...data },
+      { new: true }
+    );
+
+    if (!isUpdated)
+      return res.status(400).json({ error: true, message: "failed to update" });
+    res.status(200).json({ error: false, message: "success", data: isUpdated });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 const delSt = async (req, res) => {
   try {
     console.log(req.params);
@@ -443,7 +463,7 @@ module.exports = {
   getSingleEnrollCorses,
   putEnrollCorses,
   delEnrollCorses,
-
+  getUpdateStudent,
   createuploadtask,
   getuploadtask,
   deluploadtask,
