@@ -12,16 +12,7 @@ const TeacherRoute = require("./Routers/teachers/TeacherRoute");
 
 // app.use(bodyParser.json({ limit: "50mb" }));
 app.use(express.json());
-app.use(
-  cors({
-    origin: [
-      "https://www.smseducations.com",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://smseducations.com",
-    ],
-  })
-);
+app.use(cors());
 
 require("./config/config");
 const oneYearInSeconds = 365 * 24 * 60 * 60;
