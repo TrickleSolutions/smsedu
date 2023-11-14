@@ -209,7 +209,6 @@ const createInstructor = async (req, resp) => {
     const status = req.body.status;
 
     const usermail = await InstructorRegisterSchema.findOne({ email: email });
-    console.log(usermail);
     if (usermail) {
       resp.status(404).json({
         code: 404,
@@ -251,20 +250,29 @@ const createInstructor = async (req, resp) => {
 };
 const putInstructor = async (req, res) => {
   try {
-    const name = req.body.name;
-    const address = req.body.address;
-    const contact = req.body.contact;
-    const email = req.body.email;
-    const gender = req.body.gender;
-    const dob = req.body.dob;
-    const qualification = req.body.qualification;
-    const degree = req.body.degree;
-    const exp = req.body.exp;
-    const password = req.body.password;
-    const profilePic = req.file.filename;
-    const status = req.body.status;
+    // Validation
+    const {
+      name,
+      address,
+      contact,
+      email,
+      gender,
+      dob,
+      qualification,
+      degree,
+      exp,
+      password,
+      status,
+    } = req.body;
 
-    let data = await InstructorRegisterSchema.updateOne(
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Name, email, and password are required." });
+    }
+
+    // Update data in the database
+    const data = await InstructorRegisterSchema.updateOne(
       { _id: req.params._id },
       {
         $set: {
@@ -278,14 +286,21 @@ const putInstructor = async (req, res) => {
           degree,
           exp,
           password,
-          profilePic,
+          profilePic: req.file ? req.file.filename : undefined, // Check if file exists
           status,
         },
       }
     );
+
+    // Check if the document was found and updated
+    if (data.nModified === 0) {
+      return res.status(404).json({ error: "Instructor not found." });
+    }
+
     res.send(data);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
@@ -854,7 +869,7 @@ const deleteCategory = async (req, resp) => {
 
 const createinstructorOfMonth = async (req, res) => {
   const { name, course, desc } = req.body;
-  const img = req.file.filename;
+  const img = req.file?.filename || "image.jpg";
   let data = new InstructorOfMonthSchema({ img, name, course, desc });
   let result = await data.save();
   res.status(200).json({
@@ -925,7 +940,6 @@ const createAppointment = async (req, resp) => {
   try {
     let { name, mobile, msg } = req.body;
     const usermail = await AppointmentSchema.findOne({ mobile: mobile });
-    console.log(usermail);
     if (usermail) {
       resp.status(404).json({
         code: 404,
@@ -1165,26 +1179,68 @@ const putContact = async (req, res) => {
     console.log(err);
   }
 };
-
 const createJoinAsInstructor = async (req, res) => {
-  const { name, email, contact, qualification, exp } = req.body;
-  const cv = req.file.filename;
-  let data = new JoinInstructorSchema({
-    name,
-    email,
-    contact,
-    qualification,
-    exp,
-    cv,
-  });
-  let result = await data.save();
-  res.status(200).json({
-    code: 200,
-    message: " Request Generated successfully",
-    error: false,
-    status: true,
-  });
+  try {
+    const { name, email, contact, qualification, exp } = req.body;
+    const cv = req.file.filename;
+
+    if (!name || !email || !contact || !qualification || !exp || !cv) {
+      return res.status(400).json({
+        code: 400,
+        message: "Please provide all required fields.",
+        error: true,
+        status: false,
+      });
+    }
+
+    const data = new JoinInstructorSchema({
+      name,
+      email,
+      contact,
+      qualification,
+      exp,
+      cv,
+    });
+
+    const result = await data.save();
+
+    res.status(200).json({
+      code: 200,
+      message: "Request generated successfully",
+      error: false,
+      status: true,
+      data: result, // You can include the saved data in the response if needed.
+    });
+  } catch (error) {
+    console.error("Error creating instructor:", error);
+    res.status(500).json({
+      code: 500,
+      message: error.message,
+      error: true,
+      status: false,
+    });
+  }
 };
+
+// const createJoinAsInstructor = async (req, res) => {
+//   const { name, email, contact, qualification, exp } = req.body;
+//   const cv = req.file.filename;
+//   let data = new JoinInstructorSchema({
+//     name,
+//     email,
+//     contact,
+//     qualification,
+//     exp,
+//     cv,
+//   });
+//   let result = await data.save();
+//   res.status(200).json({
+//     code: 200,
+//     message: " Request Generated successfully",
+//     error: false,
+//     status: true,
+//   });
+// };
 const getJoinAsInstructor = async (req, res) => {
   let data = await JoinInstructorSchema.find();
   res.send(data);
