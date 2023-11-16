@@ -194,21 +194,12 @@ const deleteAdmin = async (req, resp) => {
 
 const createInstructor = async (req, resp) => {
   try {
-    const name = req.body.name;
-    const profilePic = req.file.filename;
-    const address = req.body.address;
-    const contact = req.body.contact;
-    const email = req.body.email;
-    const gender = req.body.gender;
-    const dob = req.body.dob;
-    const qualification = req.body.qualification;
-    const degree = req.body.degree;
-    const salary = req.body.salary;
-    const exp = req.body.exp;
-    const password = req.body.password;
-    const status = req.body.status;
+    console.log(req.body);
+    const formData = req.body;
 
-    const usermail = await InstructorRegisterSchema.findOne({ email: email });
+    const usermail = await InstructorRegisterSchema.findOne({
+      email: formData.email,
+    });
     if (usermail) {
       resp.status(404).json({
         code: 404,
@@ -218,21 +209,7 @@ const createInstructor = async (req, resp) => {
         status: false,
       });
     } else {
-      let data = new InstructorRegisterSchema({
-        name,
-        address,
-        profilePic,
-        contact,
-        email,
-        gender,
-        dob,
-        qualification,
-        degree,
-        salary,
-        exp,
-        password,
-        status,
-      });
+      let data = new InstructorRegisterSchema(formData);
 
       let result = await data.save();
 
@@ -250,7 +227,6 @@ const createInstructor = async (req, resp) => {
 };
 const putInstructor = async (req, res) => {
   try {
-    // Validation
     const {
       name,
       address,

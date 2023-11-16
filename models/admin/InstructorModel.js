@@ -46,10 +46,18 @@ const InstructorRegisterSchema = new mongoose.Schema({
     type: String,
     default: "user.jfif",
   },
+  cv: {
+    type: String,
+    default: "user.jfif",
+  },
 
-  salary:{
+  aadhar:{
     type:String,
-    required:true
+    default:'user.jfif'
+  },  
+  salary: {
+    type: String,
+    required: true,
   },
   status: {
     type: String,

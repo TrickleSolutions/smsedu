@@ -146,10 +146,7 @@ Router.route("/income/:_id").delete(deleteincome);
 Router.route("/income/:_id").get(getSingleincome);
 Router.route("/income/:_id").put(putincome);
 
-Router.route("/instructor").post(
-  instructorProfile.single("profilePic"),
-  createInstructor
-);
+Router.route("/instructor").post(createInstructor);
 Router.route("/instructor").get(getInstructor);
 Router.route("/instructor/:_id").delete(deleteInstructor);
 Router.route("/instructor/:_id").put(

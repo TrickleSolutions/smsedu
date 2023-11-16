@@ -1,26 +1,32 @@
-const multer=require("multer")
-var storage=multer.diskStorage({
-    destination:function(req,file,cb){
-        cb(null,'./assets/admin/instructorProfile')
-    },
-    filename:function(req,file,cb){
-        cb(null,Date.now()+file.originalname)
-    }
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./assets/admin/instructorProfile");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + file.originalname);
+  },
 });
 
-var fileFilter=(req,file,cb)=>{
-    if(file.mimetype==='image/jpeg' || file.mimetype==='image/jpg' || file.mimetype==='image/png'){
-        cb(null,true)
-    }else{
-        cb(null,false)
-    }
-}
-var instructorProfile=multer({
-    storage:storage,
-    limits:{
-        filesize:1024*1024*5
-    },
-   fileFilter:fileFilter
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/png"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
-})
-module.exports=instructorProfile;
+const instructorProfile = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+  fileFilter,
+});
+
+module.exports = instructorProfile;
