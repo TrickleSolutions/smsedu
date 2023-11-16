@@ -77,6 +77,7 @@ const {
   getSingleJoinAsInstructor,
   putJoinAsInstructor,
   delJoinAsInstructor,
+  UpdateInstructorData,
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
 const studentofmonth_upload = require("../../multer/admin/StudentOfMonth");
@@ -153,6 +154,7 @@ Router.route("/instructor/:_id").put(
   instructorProfile.single("profilePic"),
   putInstructor
 );
+Router.route("/instructor/:_id").patch(UpdateInstructorData);
 Router.route("/instructor/:_id").get(getSingleInstructor);
 
 Router.route("/course").post(course_upload.single("img"), createCourse);

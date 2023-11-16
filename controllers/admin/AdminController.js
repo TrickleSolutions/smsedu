@@ -279,6 +279,22 @@ const putInstructor = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+const UpdateInstructorData = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await InstructorRegisterSchema.findByIdAndUpdate(
+      req.params._id,
+      data,
+      { new: true }
+    );
+    if (!response)
+      return res.status(400).json({ error: true, message: "user not updated" });
+
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 
 const getInstructor = async (req, res) => {
   let data = await InstructorRegisterSchema.find();
@@ -1259,7 +1275,7 @@ module.exports = {
   getSingleContact,
   deleteContact,
   putContact,
-
+  UpdateInstructorData,
   createrolepermission,
   getrolepermission,
   getSinglerolepermission,
