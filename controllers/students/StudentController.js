@@ -122,10 +122,13 @@ const getSt = async (req, res) => {
 
   try {
     const totalDocuments = await Student_RegisterSchema.countDocuments({});
-    const data = await Student_RegisterSchema.find({}).skip(skip).limit(limit);
+    const data = await Student_RegisterSchema.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.json({
-      data, 
+      data,
       currentPage: page,
       totalPages: Math.ceil(totalDocuments / limit),
     });
