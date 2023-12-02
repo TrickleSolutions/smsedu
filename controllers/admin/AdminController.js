@@ -507,7 +507,7 @@ const putEnquiry = async (req, res) => {
   }
 };
 const getEnquiry = async (req, res) => {
-  let data = await Enquiry_adminSchema.find();
+  let data = await Enquiry_adminSchema.find({}).sort({ createdAt: -1 });
 
   res.send(data);
 };

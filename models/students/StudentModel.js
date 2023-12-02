@@ -69,6 +69,9 @@ const Student_RegisterSchema = new mongoose.Schema(
       type: String,
       default: "active",
     },
+    aadhar_pan: {
+      type: String,
+    },
     course: {
       type: String,
       required: false,
@@ -80,6 +83,12 @@ const Student_RegisterSchema = new mongoose.Schema(
     locker_no: {
       type: Number,
       default: 0,
+    },
+    thumb: {
+      type: String,
+    },
+    signature: {
+      type: String,
     },
   },
   {

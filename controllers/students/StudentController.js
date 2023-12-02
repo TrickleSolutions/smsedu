@@ -7,14 +7,15 @@ const EnrollCourseSchema = require("../../models/students/EnrollCourse");
 const InstructorRegisterSchema = require("../../models/admin/InstructorModel");
 const CourseSchema = require("../../models/admin/Add_Course");
 const VerifyModel = require("../../models/VerifyModel");
+const { read } = require("fs");
 const createSt = async (req, resp, next) => {
   try {
     const formData = req.body;
 
     const usermail = await Student_RegisterSchema.findOne({
-      email: formData.email,
+      email: formData.contact,
     });
-    console.log(usermail);
+
     if (usermail) {
       resp.status(404).json({
         code: 404,
