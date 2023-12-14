@@ -71,7 +71,7 @@ const {
   getSingleContact,
   deleteContact,
   putContact,
-
+  SearchCourses,
   createJoinAsInstructor,
   getJoinAsInstructor,
   getSingleJoinAsInstructor,
@@ -160,6 +160,7 @@ Router.route("/instructor/:_id").get(getSingleInstructor);
 Router.route("/course").post(course_upload.single("img"), createCourse);
 Router.route("/course").get(getCourse);
 Router.route("/course/:_id").get(getSingleCourse);
+Router.route("/search-course").get(SearchCourses);
 Router.route("/course/:_id").delete(deleteCourse);
 Router.route("/course/:_id").put(course_upload.single("img"), putCourse);
 Router.route("/enquiry").post(createEnquiry);

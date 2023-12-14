@@ -1264,6 +1264,27 @@ const delJoinAsInstructor = async (req, res) => {
     console.log(err);
   }
 };
+
+const SearchCourses = async (req, res) => {
+  const { title } = req.query;
+  const skip = page * limit;
+  try {
+    let query = {};
+
+    // Check if the 'type' parameter is provided
+    if (title) {
+      // If 'type' is provided, perform a case-insensitive search for titles starting with the specified alphabet
+      query = { title: { $regex: new RegExp(`^${title}`, "i") } };
+    }
+
+    // Fetch data based on the query
+    const response = await CourseSchema.find(query);
+
+    res.status(200).json({ error: false, data: response, message: "success" });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 module.exports = {
   createJoinAsInstructor,
   getJoinAsInstructor,
@@ -1287,7 +1308,7 @@ module.exports = {
   getAppointment,
   getSingleAppointment,
   deleteAppointment,
-
+  SearchCourses,
   putApproveStStatus,
 
   getSingleinstructorofmonth, //all the instructor Off Months
