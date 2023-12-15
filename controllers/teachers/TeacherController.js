@@ -1,21 +1,22 @@
-const InstructorRegisterSchema = require('../../models/admin/InstructorModel')
-const resultSchema = require('../../models/Teacher/ResultST')
-const Sheduleclass_Schema = require('../../models/Teacher/Schedule_Class')
-const assignment_Schema = require('../../models/Teacher/Add_Assignment')
-const AddFeeSchema = require('../../models/Teacher/Add_fee')
-const crypto = require('crypto');
-const Functions = require('../../library/functions');
+const InstructorRegisterSchema = require("../../models/admin/InstructorModel");
+const resultSchema = require("../../models/Teacher/ResultST");
+const Sheduleclass_Schema = require("../../models/Teacher/Schedule_Class");
+const assignment_Schema = require("../../models/Teacher/Add_Assignment");
+const AddFeeSchema = require("../../models/Teacher/Add_fee");
+const crypto = require("crypto");
+const Functions = require("../../library/functions");
 const nodemailer = require("nodemailer");
-const EventsSchema = require('../../models/Teacher/Events')
-const QueriesSchema = require('../../models/students/Queries')
-const AcademicSchema = require('../../models/students/Academicjs')
-const stStatusReqSchema = require('../../models/Teacher/Student_status_req')
-const COurseContentLinkSchema = require('../../models/Teacher/CourseContentLink')
-const COurseContentDocxSchema = require('../../models/Teacher/CourseContentdoc')
-const COurseContentVedioSchema = require('../../models/Teacher/CourseConent_vadio')
-const VerifyModel = require('../../models/VerifyModel')
+const EventsSchema = require("../../models/Teacher/Events");
+const QueriesSchema = require("../../models/students/Queries");
+const AcademicSchema = require("../../models/students/Academicjs");
+const stStatusReqSchema = require("../../models/Teacher/Student_status_req");
+const COurseContentLinkSchema = require("../../models/Teacher/CourseContentLink");
+const COurseContentDocxSchema = require("../../models/Teacher/CourseContentdoc");
+const CourseSchema = require("../../models/admin/Add_Course");
+const COurseContentVedioSchema = require("../../models/Teacher/CourseConent_vadio");
+const VerifyModel = require("../../models/VerifyModel");
 // const loginInstructor=async(req,resp,next)=>{
-//     try { 
+//     try {
 //       const email = req.body.email;
 //       const password = req.body.password;
 //       const usermail = await InstructorRegisterSchema.findOne({
@@ -48,18 +49,21 @@ const VerifyModel = require('../../models/VerifyModel')
 //       } catch (err) {
 //         console.log(err);
 //       }
-// }  
+// }
 const loginInstructor = async (req, res) => {
-
   const { contact, otp, otpid } = req.query;
 
   try {
-    if (!contact || !otp || !otpid) return res.status(400).json({ error: true, message: "invalid credentials" })
+    if (!contact || !otp || !otpid)
+      return res
+        .status(400)
+        .json({ error: true, message: "invalid credentials" });
 
-    // find the user 
-    const isUser = await InstructorRegisterSchema.findOne({ contact: contact })
-    if (!isUser) return res.status(404).json({ error: true, message: "No user found" })
-    // Verify the OTP 
+    // find the user
+    const isUser = await InstructorRegisterSchema.findOne({ contact: contact });
+    if (!isUser)
+      return res.status(404).json({ error: true, message: "No user found" });
+    // Verify the OTP
     const verifiedOtp = await VerifyModel.findOne({
       otp: otp,
       otpid: otpid,
@@ -67,9 +71,10 @@ const loginInstructor = async (req, res) => {
     });
 
     if (!verifiedOtp) {
-      return res.status(404).json({ error: true, message: "Invalid OTP or OTP expired" });
+      return res
+        .status(404)
+        .json({ error: true, message: "Invalid OTP or OTP expired" });
     }
-
 
     res.status(200).json({
       code: 200,
@@ -123,12 +128,20 @@ const loginInstructor = async (req, res) => {
   // } catch (err) {
   //   console.log(err);
   // }
-}
-
+};
 
 const createAddFee = async (req, res) => {
-  const { regno, name, amount, mode, transId, paid, date, course } = req.body
-  let data = new AddFeeSchema({ regno, name, amount, mode, transId, paid, date, course });
+  const { regno, name, amount, mode, transId, paid, date, course } = req.body;
+  let data = new AddFeeSchema({
+    regno,
+    name,
+    amount,
+    mode,
+    transId,
+    paid,
+    date,
+    course,
+  });
 
   let result = await data.save();
   res.status(200).json({
@@ -137,66 +150,68 @@ const createAddFee = async (req, res) => {
     error: false,
     status: true,
   });
-
-}
+};
 
 const putAddFee = async (req, res) => {
   try {
-
-    const { regno, name, amount, mode, transId, paid, date, course } = req.body
+    const { regno, name, amount, mode, transId, paid, date, course } = req.body;
 
     let data = await AddFeeSchema.updateOne(
       { regno: req.params.regno },
       {
-        $set: { regno, name, amount, mode, transId, paid, date, course }
+        $set: { regno, name, amount, mode, transId, paid, date, course },
       }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const delAddFee = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     let data = await AddFeeSchema.deleteOne({ regno: req.params.regno });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
-
-}
+};
 const getAllAddFee = async (req, res) => {
   let data = await AddFeeSchema.find();
-  res.send(data)
-}
+  res.send(data);
+};
 const getsingleFee = async (req, res) => {
   let data = await AddFeeSchema.find({ regno: req.params.regno });
-  res.send(data)
-}
+  res.send(data);
+};
 const getFee = async (req, res) => {
   let data = await AddFeeSchema.find();
-  res.send(data)
-}
+  res.send(data);
+};
 const gettotalpaidFee = async (req, res) => {
   //let r=await AddFeeSchema.find({regno:req.params.regno});
   // res.send(data)
   let regno = req.params.regno;
   let data = await AddFeeSchema.aggregate([
-
     {
-      $group: { _id: "$regno", totalpaid: { $sum: "$paid" } }
-    }
-  ])
-  res.send(data)
+      $group: { _id: "$regno", totalpaid: { $sum: "$paid" } },
+    },
+  ]);
+  res.send(data);
+};
+{
+  /*  RESULT SECTION */
 }
-{/*  RESULT SECTION */ }
 const createResult = async (req, res) => {
-  const { name, regno, course, topic, total_marks, obtain_marks } = req.body
-  let data = new resultSchema({ name, regno, course, topic, total_marks, obtain_marks });
+  const { name, regno, course, topic, total_marks, obtain_marks } = req.body;
+  let data = new resultSchema({
+    name,
+    regno,
+    course,
+    topic,
+    total_marks,
+    obtain_marks,
+  });
 
   let result = await data.save();
   res.status(200).json({
@@ -205,57 +220,65 @@ const createResult = async (req, res) => {
     error: false,
     status: true,
   });
-
-}
+};
 
 const putResult = async (req, res) => {
   try {
-
-    const { name, regno, course, topic, total_marks, obtain_marks } = req.body
+    const { name, regno, course, topic, total_marks, obtain_marks } = req.body;
 
     let data = await resultSchema.updateOne(
       { regno: req.params.regno },
       {
         $set: {
-          name, regno, course, topic, total_marks, obtain_marks
-        }
+          name,
+          regno,
+          course,
+          topic,
+          total_marks,
+          obtain_marks,
+        },
       }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const delResult = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     let data = await resultSchema.deleteOne({ regno: req.params.regno });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
-
-}
+};
 const getAllResult = async (req, res) => {
   let data = await resultSchema.find();
-  res.send(data)
-}
+  res.send(data);
+};
 const getsingleResult = async (req, res) => {
   let data = await resultSchema.find({ regno: req.params.regno });
-  res.send(data)
-}
+  res.send(data);
+};
 
-{/*     ScheduleClas */ }
+{
+  /*     ScheduleClas */
+}
 const getAllScheduleClass = async (req, res) => {
   let data = await Sheduleclass_Schema.find();
-  res.send(data)
-}
+  res.send(data);
+};
 const createScheduleClass = async (req, res) => {
-  const { topic, course, time, date, contact_instructor, link } = req.body
-  let data = new Sheduleclass_Schema({ topic, course, time, date, contact_instructor, link });
+  const { topic, course, time, date, contact_instructor, link } = req.body;
+  let data = new Sheduleclass_Schema({
+    topic,
+    course,
+    time,
+    date,
+    contact_instructor,
+    link,
+  });
 
   await data.save();
   res.status(200).json({
@@ -264,50 +287,53 @@ const createScheduleClass = async (req, res) => {
     error: false,
     status: true,
   });
-
-}
+};
 
 const putScheduleClass = async (req, res) => {
   try {
-
-    const { topic, course, time, date, contact_instructor, link } = req.body
+    const { topic, course, time, date, contact_instructor, link } = req.body;
 
     let data = await Sheduleclass_Schema.updateOne(
       { contact_instructor: req.params.contact_instructor },
       {
-        $set: { topic, course, time, date, contact_instructor, link }
+        $set: { topic, course, time, date, contact_instructor, link },
       }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
+};
 const delScheduleClass = async (req, res) => {
   try {
-    console.log(req.params)
-    let data = await Sheduleclass_Schema.deleteOne({ contact_instructor: req.params.contact_instructor });
+    console.log(req.params);
+    let data = await Sheduleclass_Schema.deleteOne({
+      contact_instructor: req.params.contact_instructor,
+    });
     res.send(data);
   } catch (err) {
-    console.log(err)
-
+    console.log(err);
   }
+};
 
+{
+  /*     ADD ASSGINMENT */
 }
-
-{/*     ADD ASSGINMENT */ }
 const getAssignment = async (req, res) => {
   let data = await assignment_Schema.find();
-  res.send(data)
-}
+  res.send(data);
+};
 const createAssignment = async (req, res) => {
-
   const { title, instructions, due_date, contact_instructor } = req.body;
-  let upload = req.file.filename
-  console.log(upload)
-  let data = new assignment_Schema({ title, instructions, due_date, upload, contact_instructor });
+  let upload = req.file.filename;
+  console.log(upload);
+  let data = new assignment_Schema({
+    title,
+    instructions,
+    due_date,
+    upload,
+    contact_instructor,
+  });
 
   await data.save();
   res.status(200).json({
@@ -316,66 +342,56 @@ const createAssignment = async (req, res) => {
     error: false,
     status: true,
   });
-
-
-}
+};
 
 const putAssignment = async (req, res) => {
   try {
-
-    let upload = req.file.filename
-    const { title, instructions, due_date, contact_instructor } = req.body
-
+    let upload = req.file.filename;
+    const { title, instructions, due_date, contact_instructor } = req.body;
 
     let data = await assignment_Schema.updateOne(
       { contact_instructor: req.params.contact_instructor },
       {
-        $set: { title, instructions, due_date, upload, contact_instructor }
+        $set: { title, instructions, due_date, upload, contact_instructor },
       }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-const delAssignment = async (req, res) => {
-  try {
-
-    let data = await assignment_Schema.deleteOne({ contact_instructor: req.params.contact_instructor });
-    res.send(data);
-  } catch (err) {
-    console.log(err)
-
-  }
-
-}
-const createEvent = async (req, resp) => {
-  try {
-
-    const img = req.file.filename;
-
-    const { event, desc, from, to } = req.body
-    let data = new EventsSchema({ event, desc, from, to, img });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+const delAssignment = async (req, res) => {
+  try {
+    let data = await assignment_Schema.deleteOne({
+      contact_instructor: req.params.contact_instructor,
+    });
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const createEvent = async (req, resp) => {
+  try {
+    const img = req.file.filename;
+
+    const { event, desc, from, to } = req.body;
+    let data = new EventsSchema({ event, desc, from, to, img });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getEvent = async (req, res) => {
-
   let data = await EventsSchema.find();
   res.send(data);
-}
+};
 const getSingleEvent = async (req, res) => {
-
   let data = await EventsSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteEvent = async (req, resp) => {
   try {
@@ -385,47 +401,49 @@ const deleteEvent = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putEvent = async (req, res) => {
   try {
     const img = req.file.filename;
 
-    const { event, desc, from, to } = req.body
+    const { event, desc, from, to } = req.body;
     let data = await EventsSchema.updateOne(
       { _id: req.params._id },
       { $set: { event, desc, from, to, img } }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-
-const createQuery = async (req, resp) => {
-  try {
-
-    const { regno, name, query, date, status, response } = req.body
-    let data = new QueriesSchema({ regno, name, query, date, status, response });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+
+const createQuery = async (req, resp) => {
+  try {
+    const { regno, name, query, date, status, response } = req.body;
+    let data = new QueriesSchema({
+      regno,
+      name,
+      query,
+      date,
+      status,
+      response,
+    });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getQuery = async (req, res) => {
-
   let data = await QueriesSchema.find();
   res.send(data);
-}
+};
 const getSingleQuery = async (req, res) => {
-
   let data = await QueriesSchema.find({ regno: req.params.regno });
 
   res.send(data);
-}
+};
 
 const deleteQuery = async (req, resp) => {
   try {
@@ -435,45 +453,39 @@ const deleteQuery = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putQuery = async (req, res) => {
   try {
-
-    const { regno, name, query, date, status, response } = req.body
+    const { regno, name, query, date, status, response } = req.body;
     let data = await QueriesSchema.updateOne(
       { _id: req.params._id },
       { $set: { regno, name, query, date, status, response } }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-const createAcademic = async (req, resp) => {
-  try {
-
-    const { student, course } = req.body
-    let data = new AcademicSchema({ student, course });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+const createAcademic = async (req, resp) => {
+  try {
+    const { student, course } = req.body;
+    let data = new AcademicSchema({ student, course });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getAcademic = async (req, res) => {
-
   let data = await AcademicSchema.find();
   res.send(data);
-}
+};
 const getSingleAcademic = async (req, res) => {
-
   let data = await AcademicSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteAcademic = async (req, resp) => {
   try {
@@ -483,97 +495,94 @@ const deleteAcademic = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putAcademic = async (req, res) => {
   try {
-
-    const { student, course } = req.body
+    const { student, course } = req.body;
     let data = await AcademicSchema.updateOne(
       { _id: req.params._id },
       { $set: { student, course } }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-
-}
-
+};
 
 const createContentVideo = async (req, resp) => {
   try {
     const video = req.file.filename;
-    const { name, duration, course, desc } = req.body
-    let data = new COurseContentVedioSchema({ name, duration, video, course, desc });
+    const { name, duration, course, desc } = req.body;
+    let data = new COurseContentVedioSchema({
+      name,
+      duration,
+      video,
+      course,
+      desc,
+    });
     let result = await data.save();
-    resp.send(result)
+    resp.send(result);
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 const getContentVideo = async (req, res) => {
-
   let data = await COurseContentVedioSchema.find();
   res.send(data);
-}
+};
 const getSingleContentVideo = async (req, res) => {
-
   let data = await COurseContentVedioSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteContentVideo = async (req, resp) => {
   try {
     console.log(req.params);
-    let data = await COurseContentVedioSchema.deleteOne({ _id: req.params._id });
+    let data = await COurseContentVedioSchema.deleteOne({
+      _id: req.params._id,
+    });
     resp.send(data);
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putContentVideo = async (req, res) => {
   try {
     const video = req.file.filename;
-    const { name, duration, course, desc } = req.body
+    const { name, duration, course, desc } = req.body;
     let data = await COurseContentVedioSchema.updateOne(
       { _id: req.params._id },
       { $set: { name, duration, video, course, desc } }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-
-
-const createContentDoc = async (req, resp) => {
-  try {
-    const doc = req.file.filename
-    const { name, course } = req.body
-    let data = new COurseContentDocxSchema({ name, doc, course });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+
+const createContentDoc = async (req, resp) => {
+  try {
+    const doc = req.file.filename;
+    const { name, course } = req.body;
+    let data = new COurseContentDocxSchema({ name, doc, course });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getContentDoc = async (req, res) => {
-
   let data = await COurseContentDocxSchema.find();
   res.send(data);
-}
+};
 const getSingleContentDoc = async (req, res) => {
-
   let data = await COurseContentDocxSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteContentDoc = async (req, resp) => {
   try {
@@ -583,46 +592,41 @@ const deleteContentDoc = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putContentDoc = async (req, res) => {
   try {
-    const doc = req.file.filename
-    const { name, course } = req.body
+    const doc = req.file.filename;
+    const { name, course } = req.body;
     let data = await COurseContentDocxSchema.updateOne(
       { _id: req.params._id },
       { $set: { name, doc, course } }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-
-const createContentLink = async (req, resp) => {
-  try {
-
-    const { name, link, course } = req.body
-    let data = new COurseContentLinkSchema({ name, link, course });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+
+const createContentLink = async (req, resp) => {
+  try {
+    const { name, link, course } = req.body;
+    let data = new COurseContentLinkSchema({ name, link, course });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getContentLink = async (req, res) => {
-
   let data = await COurseContentLinkSchema.find();
   res.send(data);
-}
+};
 const getSingleContentLink = async (req, res) => {
-
   let data = await COurseContentLinkSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteContentLink = async (req, resp) => {
   try {
@@ -632,45 +636,39 @@ const deleteContentLink = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putContentLink = async (req, res) => {
   try {
-
-    const { name, link, course } = req.body
+    const { name, link, course } = req.body;
     let data = await COurseContentLinkSchema.updateOne(
       { _id: req.params._id },
       { $set: { name, link, course } }
     );
     res.send(data);
-
-  } catch (err) {
-    console.log(err)
-  }
-
-}
-const createStStatusReq = async (req, resp) => {
-  try {
-
-    const { regno, name, status } = req.body
-    let data = new stStatusReqSchema({ regno, name, status });
-    let result = await data.save();
-    resp.send(result)
   } catch (err) {
     console.log(err);
   }
-}
+};
+const createStStatusReq = async (req, resp) => {
+  try {
+    const { regno, name, status } = req.body;
+    let data = new stStatusReqSchema({ regno, name, status });
+    let result = await data.save();
+    resp.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const getStStatusReq = async (req, res) => {
-
   let data = await stStatusReqSchema.find();
   res.send(data);
-}
+};
 const getSingleStStatusReq = async (req, res) => {
-
   let data = await stStatusReqSchema.find({ _id: req.params._id });
 
   res.send(data);
-}
+};
 
 const deleteStStatusReq = async (req, resp) => {
   try {
@@ -680,28 +678,140 @@ const deleteStStatusReq = async (req, resp) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 const putStStatusReq = async (req, res) => {
   try {
-
-    const { regno, name, status } = req.body
+    const { regno, name, status } = req.body;
     let data = await stStatusReqSchema.updateOne(
       { _id: req.params._id },
       { $set: { regno, name, status } }
     );
     res.send(data);
-
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
+};
 
-}
+const GetCreateFee = async (req, res) => {
+  const { regno } = req.params;
+  const data = req.body;
+  let pending_amount;
+  const _find = await AddFeeSchema.find({
+    course: data.course,
+    regno: regno,
+  });
+  if (_find) {
+    const paidAmount = _find?.reduce((a, b) => a + b.paid, 0);
+    if (paidAmount === data.courseFee)
+      return res.status(401).json({
+        error: true,
+        message: "Already Paid The full Amount for this course",
+      });
+    pending_amount = parseInt(data.courseFee - (paidAmount + data.paid));
+  } else {
+    pending_amount = data.courseFee - data.paid;
+  }
+  try {
+    const response = await new AddFeeSchema({
+      ...data,
+      pending: pending_amount,
+    }).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required fields" });
+    res.status(200).json({ error: false, message: "succes", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetDeleteFee = async (req, res) => {
+  const { id } = req.params;
+  const idToDelete = id.toLowerCase() === "all" ? {} : { _id: id };
+  try {
+    const response = await AddFeeSchema.deleteMany(idToDelete);
+    if (response.deletedCount === 0)
+      return res
+        .status(404)
+        .json({ error: true, message: "No data found with this id " });
+    res.status(200).json({ error: false, message: "success" });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllThFeeData = async (req, res) => {
+  const data = req.query;
+  try {
+    const response = await AddFeeSchema.find(data).sort({ createdAt: -1 });
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
-  createContentLink, getContentLink, getSingleContentLink, getSingleContentLink, deleteContentLink, putContentLink,
-  createContentDoc, getContentDoc, getSingleContentDoc, deleteContentDoc, putContentDoc,
-  createContentVideo, getContentVideo, getSingleContentVideo, deleteContentVideo, putContentVideo,
-  createAcademic, getAcademic, getSingleAcademic, deleteAcademic, putAcademic, createEvent, getEvent, getSingleEvent, deleteEvent, putEvent, createQuery, getQuery, getSingleQuery, deleteQuery, putQuery,
-  getAssignment, createAssignment, putAssignment, delAssignment, createAddFee, putAddFee, delAddFee, getAllAddFee, gettotalpaidFee, getsingleFee, getFee
-  , loginInstructor, createScheduleClass, putScheduleClass, delScheduleClass, getAllScheduleClass, getAllResult, getsingleResult, delResult, putResult, createResult,
-  putStStatusReq, deleteStStatusReq, getSingleStStatusReq, getStStatusReq, createStStatusReq
-}
+  GetCreateFee,
+  GetAllThFeeData,
+  createContentLink,
+  getContentLink,
+  getSingleContentLink,
+  getSingleContentLink,
+  deleteContentLink,
+  putContentLink,
+  createContentDoc,
+  getContentDoc,
+  getSingleContentDoc,
+  deleteContentDoc,
+  putContentDoc,
+  createContentVideo,
+  getContentVideo,
+  getSingleContentVideo,
+  deleteContentVideo,
+  putContentVideo,
+  createAcademic,
+  getAcademic,
+  getSingleAcademic,
+  deleteAcademic,
+  putAcademic,
+  createEvent,
+  getEvent,
+  getSingleEvent,
+  deleteEvent,
+  putEvent,
+  createQuery,
+  getQuery,
+  getSingleQuery,
+  deleteQuery,
+  putQuery,
+  getAssignment,
+  createAssignment,
+  putAssignment,
+  delAssignment,
+  createAddFee,
+  putAddFee,
+  delAddFee,
+  getAllAddFee,
+  gettotalpaidFee,
+  getsingleFee,
+  GetDeleteFee,
+  getFee,
+  loginInstructor,
+  createScheduleClass,
+  putScheduleClass,
+  delScheduleClass,
+  getAllScheduleClass,
+  getAllResult,
+  getsingleResult,
+  delResult,
+  putResult,
+  createResult,
+  putStStatusReq,
+  deleteStStatusReq,
+  getSingleStStatusReq,
+  getStStatusReq,
+  createStStatusReq,
+};

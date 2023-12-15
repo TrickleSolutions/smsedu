@@ -1267,7 +1267,6 @@ const delJoinAsInstructor = async (req, res) => {
 
 const SearchCourses = async (req, res) => {
   const { title } = req.query;
-  const skip = page * limit;
   try {
     let query = {};
 
