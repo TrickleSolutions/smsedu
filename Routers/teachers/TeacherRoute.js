@@ -48,6 +48,11 @@ const {
   putContentLink,
   createContentDoc,
   getContentDoc,
+  // New fee functions
+  GetCreateFee,
+  GetDeleteFee,
+  GetAllThFeeData,
+  // ----------------
   getSingleContentDoc,
   deleteContentDoc,
   putContentDoc,
@@ -131,6 +136,12 @@ Router.route("/fee").get(getFee);
 Router.route("/fee/:regno").delete(delAddFee);
 Router.route("/fee/:regno").get(getsingleFee);
 Router.route("/totalpaidfee").get(gettotalpaidFee);
+
+// Fee New Apis
+Router.route("/fee/create/:regno").post(GetCreateFee);
+Router.route("/fee/delete/:id").delete(GetDeleteFee);
+Router.route("/fee/data/get").get(GetAllThFeeData);
+
 /*  Instructor Login */
 Router.route("/instructorlogin").get(loginInstructor);
 /*  Class ROUTER */
