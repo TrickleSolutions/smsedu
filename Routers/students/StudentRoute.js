@@ -19,6 +19,7 @@ const {
   getSingleEnrollCorses,
   putEnrollCorses,
   delEnrollCorses,
+  GetStudentCareerInfo,
 } = require("../../controllers/students/StudentController");
 const tast_assignment_upload = require("../../multer/students/task_upload");
 const studentProfile_upload = require("../../multer/students/StudentProfile");
@@ -33,12 +34,14 @@ Router.route("/students").post(createSt);
 Router.route("/students").get(getSt);
 Router.route("/students/:_id").get(getsingleSt);
 // Router.route("/students/:_id").put(putSt);
-Router.route("/students/:_id").patch(getUpdateStudent)
+Router.route("/students/:_id").patch(getUpdateStudent);
 Router.route("/students/:_id").delete(delSt);
 Router.route("/studentlogin").post(loginSt);
 Router.route("/mail").get(sendforgetPass);
 Router.route("/api/userchangepassword/:token").put(stChangepass);
 
+// Get the Student Course and instructor by id
+Router.route("/student/career/info/:id").get(GetStudentCareerInfo);
 
 Router.route("/uploadtask").post(
   tast_assignment_upload.single("img"),
