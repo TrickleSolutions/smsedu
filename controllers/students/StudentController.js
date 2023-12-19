@@ -8,6 +8,7 @@ const InstructorRegisterSchema = require("../../models/admin/InstructorModel");
 const CourseSchema = require("../../models/admin/Add_Course");
 const VerifyModel = require("../../models/VerifyModel");
 const { read } = require("fs");
+const { default: mongoose } = require("mongoose");
 const createSt = async (req, resp, next) => {
   try {
     const formData = req.body;
@@ -475,6 +476,37 @@ const delEnrollCorses = async (req, res) => {
   }
 };
 
+const GetStudentCareerInfo = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const data = await Student_RegisterSchema.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "course_admins",
+          foreignField: "title",
+          localField: "course",
+          as: "enrolled_courses",
+        },
+      },
+    ]);
+    const courseId = data[0]?.enrolled_courses?.map((item) => item?.instructor);
+
+    const _findInstructor = await InstructorRegisterSchema.find({
+      _id: { $in: courseId },
+    });
+
+    res.status(200).json({
+      error: false,
+      message: "succes",
+      data: { data, instructors: _findInstructor },
+    });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   createSt,
   createEnrollCorses,
@@ -485,6 +517,7 @@ module.exports = {
   getUpdateStudent,
   createuploadtask,
   getuploadtask,
+  GetStudentCareerInfo,
   deluploadtask,
   putuploadtask,
   getsingleSt,

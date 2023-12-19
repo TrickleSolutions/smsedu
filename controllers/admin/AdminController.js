@@ -1284,9 +1284,30 @@ const SearchCourses = async (req, res) => {
     res.status(500).json({ error: true, message: error.message });
   }
 };
+const GetAllInstructorStudent = async (req, res) => {
+  const { instructor } = req.params;
+  try {
+    const response = await CourseSchema.aggregate([
+      { $match: { instructor: instructor } },
+    ]);
+    const allCourseArray = response?.map((item) => item.title);
+
+    const GetAllStudents = await Student_RegisterSchema.aggregate([
+      { $match: { course: { $in: allCourseArray } } },
+    ]);
+
+    res
+      .status(200)
+      .json({ error: false, message: "success", data: GetAllStudents });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   createJoinAsInstructor,
   getJoinAsInstructor,
+  GetAllInstructorStudent,
   getSingleJoinAsInstructor,
   putJoinAsInstructor,
   delJoinAsInstructor,
