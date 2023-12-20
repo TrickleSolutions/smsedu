@@ -11,12 +11,24 @@ const schema = new Schema(
       type: Object,
       required: true,
     },
+    sr_no: {
+      type: String,
+      required: true,
+    },
     certificate: {
       type: String,
       required: true,
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "course_admins",
     },
   },
   {
     timestamps: true,
   }
 );
+
+const CertificateModel = model("cetificates", schema);
+
+module.exports = CertificateModel;
