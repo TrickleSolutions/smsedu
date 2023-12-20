@@ -79,11 +79,19 @@ const {
   delJoinAsInstructor,
   GetAllInstructorStudent,
   UpdateInstructorData,
+  GetAllInstructorWithCourse,
   // Batches
   CreateBatch,
   UpdateBatches,
   GetAllBatches,
   DeleteBatches,
+  // certificates
+  GenerateCertificates,
+  UpdateCertificate,
+  DeleteCertificate,
+  GetAllCertificates,
+  GenerateSerialNumber,
+  // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
 const studentofmonth_upload = require("../../multer/admin/StudentOfMonth");
@@ -211,9 +219,19 @@ Router.route("/batch/create").post(CreateBatch);
 Router.route("/batch/update/:id").patch(UpdateBatches);
 Router.route("/batch/get").get(GetAllBatches);
 Router.route("/batch/delete/:id").delete(DeleteBatches);
-// CreateBatch,
-// UpdateBatches,
-// GetAllBatches,
-// DeleteBatches,
+
+// certificates
+Router.route("/certificate/generate").post(GenerateCertificates);
+Router.route("/certificate/get").get(GetAllCertificates);
+Router.route("/certificate/update/:id").patch(UpdateCertificate);
+Router.route("/certificate/delete/:id").delete(DeleteCertificate);
+Router.route("/certificate/generate/number").get(GenerateSerialNumber);
+
+// certificates
+// GenerateCertificates,
+// UpdateCertificate,
+// DeleteCertificate,
+// GetAllCertificates,
+// ---------cetrificates end --------------
 
 module.exports = Router;

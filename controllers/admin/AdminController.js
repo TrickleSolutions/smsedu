@@ -16,6 +16,8 @@ const JoinInstructorSchema = require("../../models/admin/joinasinstructor");
 const generateEnquiryNo = require("../../funcs/enquiry");
 const BatchModel = require("../../models/admin/Batches");
 const { default: mongoose } = require("mongoose");
+const CertificateModel = require("../../models/admin/certificates");
+const GenerateCertificatesNumber = require("../../funcs/generateCertificateNumber");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1400,7 +1402,96 @@ const DeleteBatches = async (req, res) => {
   }
 };
 
+// Certificates
+const GenerateCertificates = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await new CertificateModel(data).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing requried fields " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateCertificate = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await CertificateModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteCertificate = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await CertificateModel.findByIdAndDelete(id);
+    if (!response)
+      return res.status(404).json({
+        error: true,
+        message: "no data found with this id to delete ",
+      });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllCertificates = async (req, res) => {
+  // certificate as per instructor or student
+  const { instructor, student, course, srno } = req.query;
+  let _find;
+  if (instructor) {
+    _find = { instructor: instructor };
+  } else if (student) {
+    _find = { student: student };
+  } else if (course) {
+    _find = { course: course };
+  } else if (srno) {
+    _find = { sr_no: srno };
+  } else {
+    _find = {};
+  }
+
+  try {
+    const response = await CertificateModel.find(_find);
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GenerateSerialNumber = async (req, res) => {
+  try {
+    const createCertificateNumber = await GenerateCertificatesNumber();
+    res.status(200).json({ error: false, data: createCertificateNumber });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  // certificates
+  GenerateCertificates,
+  UpdateCertificate,
+  DeleteCertificate,
+  GetAllCertificates,
+  GenerateSerialNumber,
+  // ---------cetrificates end --------------
   createJoinAsInstructor,
   getJoinAsInstructor,
   GetAllInstructorStudent,
