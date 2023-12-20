@@ -14,6 +14,8 @@ const rolesPermissionSchema = require("../../models/admin/permission");
 const ContactSchema = require("../../models/admin/contactform");
 const JoinInstructorSchema = require("../../models/admin/joinasinstructor");
 const generateEnquiryNo = require("../../funcs/enquiry");
+const BatchModel = require("../../models/admin/Batches");
+const { default: mongoose } = require("mongoose");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1304,6 +1306,100 @@ const GetAllInstructorStudent = async (req, res) => {
   }
 };
 
+// Batches
+const CreateBatch = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await new BatchModel(data).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing requried credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateBatches = async (req, res) => {
+  const data = req.body;
+  const { id } = req.params;
+  try {
+    const response = await BatchModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing Requried fields" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllBatches = async (req, res) => {
+  const { instructor, id } = req.query;
+  let _find;
+  if (instructor) {
+    _find = { instructor: new mongoose.Types.ObjectId(instructor) };
+  } else if (id) {
+    _find = { _id: new mongoose.Types.ObjectId(id) };
+  } else {
+    _find = {};
+  }
+
+  try {
+    const response = await BatchModel.aggregate([
+      { $match: _find },
+      {
+        $lookup: {
+          from: "instructorregisters",
+          foreignField: "_id",
+          localField: "instructor",
+          as: "instructor",
+        },
+      },
+      { $unwind: "$instructor" },
+      {
+        $lookup: {
+          from: "course_admins",
+          foreignField: "_id",
+          localField: "course",
+          as: "course",
+        },
+      },
+      { $unwind: "$course" },
+      {
+        $lookup: {
+          from: "student_registers",
+          foreignField: "_id",
+          localField: "students",
+          as: "students",
+        },
+      },
+    ]);
+
+    if (!response || response.length === 0) {
+      return res.status(404).json({ error: true, message: "No data found" });
+    }
+
+    res.status(200).json({ error: false, message: "Success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteBatches = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await BatchModel.findByIdAndDelete(id);
+    res.status(200).json({ error: false, message: "success", response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   createJoinAsInstructor,
   getJoinAsInstructor,
@@ -1382,4 +1478,9 @@ module.exports = {
   getSingleInstructor,
   getSingleExpense,
   getSingleAdmin,
+  // Batches
+  CreateBatch,
+  UpdateBatches,
+  GetAllBatches,
+  DeleteBatches,
 };

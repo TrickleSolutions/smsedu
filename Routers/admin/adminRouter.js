@@ -79,6 +79,11 @@ const {
   delJoinAsInstructor,
   GetAllInstructorStudent,
   UpdateInstructorData,
+  // Batches
+  CreateBatch,
+  UpdateBatches,
+  GetAllBatches,
+  DeleteBatches,
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
 const studentofmonth_upload = require("../../multer/admin/StudentOfMonth");
@@ -200,4 +205,15 @@ Router.route("/instructorofmonth/:_id").put(
   putinstructorOfMonth
 );
 Router.route("/instructorofmonth/:_id").get(getSingleinstructorofmonth);
+
+// Batches
+Router.route("/batch/create").post(CreateBatch);
+Router.route("/batch/update/:id").patch(UpdateBatches);
+Router.route("/batch/get").get(GetAllBatches);
+Router.route("/batch/delete/:id").delete(DeleteBatches);
+// CreateBatch,
+// UpdateBatches,
+// GetAllBatches,
+// DeleteBatches,
+
 module.exports = Router;
