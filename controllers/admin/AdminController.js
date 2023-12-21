@@ -18,6 +18,8 @@ const BatchModel = require("../../models/admin/Batches");
 const { default: mongoose } = require("mongoose");
 const CertificateModel = require("../../models/admin/certificates");
 const GenerateCertificatesNumber = require("../../funcs/generateCertificateNumber");
+const CourseLessionModel = require("../../models/admin/courseLessions");
+const HolidayModel = require("../../models/admin/Holiday");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1484,7 +1486,157 @@ const GenerateSerialNumber = async (req, res) => {
   }
 };
 
+// ================ COurse Lession
+const CreateCourseLession = async (req, res) => {
+  const data = req.body;
+  const { courseid } = req.params;
+
+  const _findCourse = await CourseSchema.findById(courseid);
+  try {
+    const _createdData = await new CourseLessionModel({
+      ...data,
+      course: _findCourse._id,
+    }).save();
+    if (!_createdData)
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required credentials" });
+    res
+      .status(200)
+      .json({ error: false, message: "success", data: _createdData });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateCourseLession = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await CourseLessionModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const deleteCouseLession = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await CourseLessionModel.findByIdAndDelete({ _id: id });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllCourseLession = async (req, res) => {
+  const { course, search, subtitle } = req.query;
+
+  let searchData = {};
+
+  if (course) {
+    searchData = { course: course };
+  }
+  if (search) {
+    searchData = { title: { $regex: search, $options: "i" } };
+  }
+  if (subtitle) {
+    searchData = { subtitle: { $regex: subtitle, $options: "i" } };
+  }
+
+  try {
+    const _find = await CourseLessionModel.find(searchData);
+    res.status(200).json({ error: true, message: "success", data: _find });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+// Holiday Controllers
+const CreateHoliday = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await new HolidayModel(data).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required  credentials" });
+    res.status(200).json({ error: true, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+// update
+const Updateholiday = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await HolidayModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteHoliday = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await HolidayModel.findByIdAndDelete(id);
+    res.status(200).json({ error: true, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetHoliday = async (req, res) => {
+  const { from, to, search } = req.query;
+
+  let searchData = {};
+
+  if (from && to) {
+    searchData = {
+      from: { $gte: from },
+      to: { $lte: to },
+    };
+  }
+
+  if (search) {
+    searchData = { name: { $regex: search, $options: "i" } };
+  }
+  try {
+    const response = await HolidayModel.find(searchData);
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  // create lession and sub lesssion ===================================
+  CreateCourseLession,
+  UpdateCourseLession,
+  deleteCouseLession,
+  GetAllCourseLession,
+  // Holidays ==================================
+  CreateHoliday,
+  Updateholiday,
+  DeleteHoliday,
+  GetHoliday,
   // certificates
   GenerateCertificates,
   UpdateCertificate,

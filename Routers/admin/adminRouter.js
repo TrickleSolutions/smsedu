@@ -91,6 +91,14 @@ const {
   DeleteCertificate,
   GetAllCertificates,
   GenerateSerialNumber,
+  CreateCourseLession,
+  UpdateCourseLession,
+  deleteCouseLession,
+  GetAllCourseLession,
+  CreateHoliday,
+  Updateholiday,
+  DeleteHoliday,
+  GetHoliday,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -227,6 +235,22 @@ Router.route("/certificate/update/:id").patch(UpdateCertificate);
 Router.route("/certificate/delete/:id").delete(DeleteCertificate);
 Router.route("/certificate/generate/number").get(GenerateSerialNumber);
 
+// Course Day By Day
+Router.route("/course/lessions/:courseid").post(CreateCourseLession);
+Router.route("/course/lessions/update/:id").patch(UpdateCourseLession);
+Router.route("/course/lessions/delete/:id").delete(deleteCouseLession);
+Router.route("/course/lessions/get").get(GetAllCourseLession);
+// Router.route("/course/lessions/:courseid");
+
+Router.route("/holiday/create").post(CreateHoliday);
+Router.route("/holiday/update/:id").patch(Updateholiday);
+Router.route("/holiday/delete/:id").delete(DeleteHoliday);
+Router.route("/holiday/get").get(GetHoliday);
+
+// CreateHoliday,
+// Updateholiday,
+// DeleteHoliday,
+// GetHoliday,
 // certificates
 // GenerateCertificates,
 // UpdateCertificate,
