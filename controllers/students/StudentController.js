@@ -526,7 +526,7 @@ const UpdateFeedback = async (req, res) => {
   const { id } = req.params;
   const data = req.body;
   try {
-    const response = await new FeedBackModel.findByIdAndUpdate(id, data, {
+    const response = await FeedBackModel.findByIdAndUpdate(id, data, {
       new: true,
     });
     if (!response)
@@ -541,7 +541,7 @@ const UpdateFeedback = async (req, res) => {
 const DeleteFeedback = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await new FeedBackModel.findByIdAndDelete(id);
+    const response = await FeedBackModel.findByIdAndDelete(id);
     if (!response)
       return res
         .status(404)
@@ -555,7 +555,7 @@ const GetFeedback = async (req, res) => {
   const { id } = req.query;
   try {
     const _find = id ? { _id: id } : {};
-    const response = await new FeedBackModel.find(_find);
+    const response = await FeedBackModel.find(_find);
     if (!response)
       return res.status(404).json({ error: true, message: "no data found " });
     res.status(200).json({ error: false, message: "success", data: response });
