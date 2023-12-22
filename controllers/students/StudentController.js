@@ -9,6 +9,7 @@ const CourseSchema = require("../../models/admin/Add_Course");
 const VerifyModel = require("../../models/VerifyModel");
 const { read } = require("fs");
 const { default: mongoose } = require("mongoose");
+const FeedBackModel = require("../../models/students/Feedback");
 const createSt = async (req, resp, next) => {
   try {
     const formData = req.body;
@@ -507,7 +508,67 @@ const GetStudentCareerInfo = async (req, res) => {
   }
 };
 
+// Feed Back
+const CreateFeedback = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await new FeedBackModel(data).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+const UpdateFeedback = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await new FeedBackModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+const DeleteFeedback = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await new FeedBackModel.findByIdAndDelete(id);
+    if (!response)
+      return res
+        .status(404)
+        .json({ error: true, message: "no data found with this id " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+const GetFeedback = async (req, res) => {
+  const { id } = req.query;
+  try {
+    const _find = id ? { _id: id } : {};
+    const response = await new FeedBackModel.find(_find);
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 module.exports = {
+  // feedback
+  CreateFeedback,
+  UpdateFeedback,
+  DeleteFeedback,
+  GetFeedback,
   createSt,
   createEnrollCorses,
   getEnrollCorses,
