@@ -1626,6 +1626,29 @@ const GetHoliday = async (req, res) => {
   }
 };
 
+// course wise student
+const CourseWiseStudent = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await CourseSchema.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "student_registers",
+          localField: "title",
+          foreignField: "course",
+          as: "student",
+        },
+      },
+    ]);
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   // create lession and sub lesssion ===================================
   CreateCourseLession,
@@ -1726,4 +1749,5 @@ module.exports = {
   UpdateBatches,
   GetAllBatches,
   DeleteBatches,
+  CourseWiseStudent,
 };

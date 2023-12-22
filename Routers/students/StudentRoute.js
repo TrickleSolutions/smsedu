@@ -20,6 +20,10 @@ const {
   putEnrollCorses,
   delEnrollCorses,
   GetStudentCareerInfo,
+  CreateFeedback,
+  UpdateFeedback,
+  DeleteFeedback,
+  GetFeedback,
 } = require("../../controllers/students/StudentController");
 const tast_assignment_upload = require("../../multer/students/task_upload");
 const studentProfile_upload = require("../../multer/students/StudentProfile");
@@ -53,5 +57,11 @@ Router.route("/uploadtask/:regno").put(
   putuploadtask
 );
 Router.route("/uploadtask/:regno").delete(deluploadtask);
+
+// FeedBack routes============================================
+Router.route("/feedback/create").post(CreateFeedback);
+Router.route("/feedback/update/:id").patch(UpdateFeedback);
+Router.route("/feedback/delete/:id").delete(DeleteFeedback);
+Router.route("/feedback/get").get(GetFeedback);
 
 module.exports = Router;

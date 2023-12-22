@@ -98,6 +98,7 @@ const {
   CreateHoliday,
   Updateholiday,
   DeleteHoliday,
+  CourseWiseStudent,
   GetHoliday,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
@@ -182,6 +183,9 @@ Router.route("/instructor/:_id").get(getSingleInstructor);
 Router.route("/course").post(course_upload.single("img"), createCourse);
 Router.route("/course").get(getCourse);
 Router.route("/course/:_id").get(getSingleCourse);
+// coursewise student
+Router.route("/course-students/:id").get(CourseWiseStudent);
+// insturctor wise course and his students
 Router.route("/course/students/:instructor").get(GetAllInstructorStudent);
 Router.route("/search-course").get(SearchCourses);
 Router.route("/course/:_id").delete(deleteCourse);
