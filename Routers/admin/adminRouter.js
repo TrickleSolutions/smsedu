@@ -100,6 +100,10 @@ const {
   DeleteHoliday,
   CourseWiseStudent,
   GetHoliday,
+  CreateDayByDayPlan,
+  DeleteDayByDayPlan,
+  GetDayByDay,
+  UpdateDayByDay,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -250,6 +254,11 @@ Router.route("/holiday/create").post(CreateHoliday);
 Router.route("/holiday/update/:id").patch(Updateholiday);
 Router.route("/holiday/delete/:id").delete(DeleteHoliday);
 Router.route("/holiday/get").get(GetHoliday);
+
+Router.route("/day-by-day/create").post(CreateDayByDayPlan);
+Router.route("/day-by-day/update/:id").patch(UpdateDayByDay);
+Router.route("/day-by-day/get").get(GetDayByDay);
+Router.route("/day-by-day/delete/:id").delete(DeleteDayByDayPlan);
 
 // CreateHoliday,
 // Updateholiday,

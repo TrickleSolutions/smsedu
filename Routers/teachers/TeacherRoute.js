@@ -173,4 +173,10 @@ Router.route("/assign/:contact_instructor").put(
 );
 Router.route("/assign/:contact_instructor").delete(delAssignment);
 Router.route("/assign").get(getAssignment);
+
+
+
+
+// Exam fee reciept generate
+
 module.exports = Router;

@@ -20,6 +20,7 @@ const CertificateModel = require("../../models/admin/certificates");
 const GenerateCertificatesNumber = require("../../funcs/generateCertificateNumber");
 const CourseLessionModel = require("../../models/admin/courseLessions");
 const HolidayModel = require("../../models/admin/Holiday");
+const DayByDayModel = require("../../models/admin/DayByDay");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1649,7 +1650,83 @@ const CourseWiseStudent = async (req, res) => {
   }
 };
 
+// Day By Day Api
+
+const CreateDayByDayPlan = async (req, res) => {
+  const data = req.body;
+  try {
+    const response = await new DayByDayModel(data).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteDayByDayPlan = async (req, res) => {
+  const { id } = req.params;
+  const _delete = id.toLowerCase() !== "all" ? { _id: id } : {};
+  try {
+    const response = await DayByDayModel.deleteMany(_delete);
+    if (response.deletedCount === 0)
+      return res
+        .status(404)
+        .json({ error: true, message: "no data found to delete" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetDayByDay = async (req, res) => {
+  const { search, course } = req.query;
+  try {
+    let searchData = {};
+
+    if (search) {
+      searchData["$or"] = [
+        { "plan.theory": { $regex: search, $options: "i" } },
+        { "plan.practical": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (course) {
+      searchData.course = new mongoose.Types.ObjectId(course);
+    }
+
+    const response = await DayByDayModel.find(searchData);
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateDayByDay = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await DayByDayModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing Required Credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  // Day By day Plan ===========================
+  CreateDayByDayPlan,
+  DeleteDayByDayPlan,
+  GetDayByDay,
+  UpdateDayByDay,
   // create lession and sub lesssion ===================================
   CreateCourseLession,
   UpdateCourseLession,
