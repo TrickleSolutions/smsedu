@@ -10,15 +10,10 @@ const schema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "course_admins",
     },
-    video: {
+    uploads: {
       type: Array,
     },
-    docs: {
-      type: Array,
-    },
-    links: {
-      type: Array,
-    },
+
     title: {
       type: String,
       required: true,
