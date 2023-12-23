@@ -1,15 +1,15 @@
-const CertificateNumber = require("../models/certificateNumber");
+const RecieptId = require("../models/RecieptId");
 
-const GenerateCertificatesNumber = async () => {
+const GenerateRecieptId = async () => {
   let SeqData;
-  SeqData = await CertificateNumber.findOneAndUpdate(
+  SeqData = await RecieptId.findOneAndUpdate(
     {},
     { $inc: { seq: 1 } },
     { new: true }
   );
 
   if (!SeqData) {
-    SeqData = await new CertificateNumber({
+    SeqData = await new RecieptId({
       id: "SMS",
       seq: 0,
     }).save();
@@ -18,4 +18,4 @@ const GenerateCertificatesNumber = async () => {
   return `SMS${SeqData.seq.toString().padStart(4, "0")}`;
 };
 
-module.exports = GenerateCertificatesNumber;
+module.exports = GenerateRecieptId;
