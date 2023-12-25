@@ -185,6 +185,6 @@ Router.route("/reciept/sr-no").get(GenerateRecieptID);
 Router.route("/reciept/create").post(CreateExamReciept);
 Router.route("/reciept/update/:id").patch(UpdateExamReciept);
 Router.route("/reciept/get").get(GetAllExamReciept);
-Router.route("/reciept/delete/:id").get(DeleteExamReciept);
+Router.route("/reciept/delete/:id").delete(DeleteExamReciept);
 
 module.exports = Router;

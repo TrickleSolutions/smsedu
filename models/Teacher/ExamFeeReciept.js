@@ -2,6 +2,10 @@ const { model, Schema, default: mongoose } = require("mongoose");
 
 const schema = new Schema(
   {
+    recieptId: {
+      type: String,
+      required: true,
+    },
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "student_registers",

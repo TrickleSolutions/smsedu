@@ -241,7 +241,9 @@ Router.route("/certificate/generate").post(GenerateCertificates);
 Router.route("/certificate/get").get(GetAllCertificates);
 Router.route("/certificate/update/:id").patch(UpdateCertificate);
 Router.route("/certificate/delete/:id").delete(DeleteCertificate);
-Router.route("/certificate/generate/number").get(GenerateSerialNumber);
+Router.route("/certificate/generate/number/:courseid/:studentId").get(
+  GenerateSerialNumber
+);
 
 // Course Day By Day
 Router.route("/course/lessions/:courseid").post(CreateCourseLession);
@@ -259,16 +261,5 @@ Router.route("/day-by-day/create").post(CreateDayByDayPlan);
 Router.route("/day-by-day/update/:id").patch(UpdateDayByDay);
 Router.route("/day-by-day/get").get(GetDayByDay);
 Router.route("/day-by-day/delete/:id").delete(DeleteDayByDayPlan);
-
-// CreateHoliday,
-// Updateholiday,
-// DeleteHoliday,
-// GetHoliday,
-// certificates
-// GenerateCertificates,
-// UpdateCertificate,
-// DeleteCertificate,
-// GetAllCertificates,
-// ---------cetrificates end --------------
 
 module.exports = Router;

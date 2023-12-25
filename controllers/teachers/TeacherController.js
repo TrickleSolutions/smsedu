@@ -769,6 +769,7 @@ const GenerateRecieptID = async (req, res) => {
 const CreateExamReciept = async (req, res) => {
   const data = req.body;
   try {
+    // check All the Data
     const response = await new ExamFeeRecieptModel(data).save();
     if (!response)
       res
