@@ -15,6 +15,8 @@ const COurseContentDocxSchema = require("../../models/Teacher/CourseContentdoc")
 const CourseSchema = require("../../models/admin/Add_Course");
 const COurseContentVedioSchema = require("../../models/Teacher/CourseConent_vadio");
 const VerifyModel = require("../../models/VerifyModel");
+const GenerateRecieptId = require("../../funcs/RecieptNumbergenerater");
+const ExamFeeRecieptModel = require("../../models/Teacher/ExamFeeReciept");
 // const loginInstructor=async(req,resp,next)=>{
 //     try {
 //       const email = req.body.email;
@@ -753,7 +755,74 @@ const GetAllThFeeData = async (req, res) => {
   }
 };
 
+// Recipte Id generate
+const GenerateRecieptID = async (req, res) => {
+  try {
+    const response = await GenerateRecieptId();
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+// Create Reciept
+const CreateExamReciept = async (req, res) => {
+  const data = req.body;
+  try {
+    // check All the Data
+    const response = await new ExamFeeRecieptModel(data).save();
+    if (!response)
+      res
+        .status(400)
+        .json({ error: true, message: "required credentials missing" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+const UpdateExamReciept = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await ExamFeeRecieptModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      res
+        .status(400)
+        .json({ error: true, message: "required credentials missing" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllExamReciept = async (req, res) => {
+  try {
+    const response = await ExamFeeRecieptModel.find({});
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteExamReciept = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const _delete = id.toLowerCase() !== "all" ? { _id: id } : {};
+    const response = await ExamFeeRecieptModel.deleteMany(_delete);
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  CreateExamReciept,
+  UpdateExamReciept,
+  GenerateRecieptID,
+  GetAllExamReciept,
+  DeleteExamReciept,
   GetCreateFee,
   GetAllThFeeData,
   createContentLink,

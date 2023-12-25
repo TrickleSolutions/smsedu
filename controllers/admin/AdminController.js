@@ -1479,9 +1479,26 @@ const GetAllCertificates = async (req, res) => {
 };
 
 const GenerateSerialNumber = async (req, res) => {
+  const { courseid, studentId } = req.params;
   try {
-    const createCertificateNumber = await GenerateCertificatesNumber();
-    res.status(200).json({ error: false, data: createCertificateNumber });
+    const [_find, _findStudent] = await Promise.all([
+      CourseSchema.findOne({ _id: courseid }),
+      Student_RegisterSchema.findOne({ _id: studentId }),
+    ]);
+
+    if (!_findStudent || _findStudent.course !== _find.title) {
+      return res.status(400).json({
+        error: true,
+        message: "There is no record of this student completing this course",
+      });
+    }
+
+    const createCertificateNumber = await GenerateCertificatesNumber(
+      [_find.duration],
+      _findStudent.admdate,
+    );
+
+    res.status(200).json({ error: false, createCertificateNumber });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }

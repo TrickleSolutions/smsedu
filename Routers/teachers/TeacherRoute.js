@@ -66,6 +66,11 @@ const {
   getSingleStStatusReq,
   getStStatusReq,
   createStStatusReq,
+  GenerateRecieptID,
+  CreateExamReciept,
+  UpdateExamReciept,
+  GetAllExamReciept,
+  DeleteExamReciept,
 } = require("../../controllers/teachers/TeacherController");
 /**fee */
 
@@ -174,9 +179,12 @@ Router.route("/assign/:contact_instructor").put(
 Router.route("/assign/:contact_instructor").delete(delAssignment);
 Router.route("/assign").get(getAssignment);
 
-
-
-
 // Exam fee reciept generate
+// generate reciept id
+Router.route("/reciept/sr-no").get(GenerateRecieptID);
+Router.route("/reciept/create").post(CreateExamReciept);
+Router.route("/reciept/update/:id").patch(UpdateExamReciept);
+Router.route("/reciept/get").get(GetAllExamReciept);
+Router.route("/reciept/delete/:id").delete(DeleteExamReciept);
 
 module.exports = Router;
