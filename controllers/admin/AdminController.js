@@ -1180,8 +1180,7 @@ const putContact = async (req, res) => {
 };
 const createJoinAsInstructor = async (req, res) => {
   try {
-    const { name, email, contact, qualification, exp } = req.body;
-    const cv = req.file.filename;
+    const { name, email, contact, qualification, exp, cv } = req.body;
 
     if (!name || !email || !contact || !qualification || !exp || !cv) {
       return res.status(400).json({
@@ -1251,8 +1250,7 @@ const getSingleJoinAsInstructor = async (req, res) => {
 
 const putJoinAsInstructor = async (req, res) => {
   try {
-    const cv = req.file.filename;
-    const { name, email, contact, qualification, exp } = req.body;
+    const { name, email, contact, qualification, exp, cv } = req.body;
     let data = await JoinInstructorSchema.updateOne(
       { _id: req.params._id },
       { $set: { name, email, contact, qualification, exp, cv } }
@@ -1495,7 +1493,7 @@ const GenerateSerialNumber = async (req, res) => {
 
     const createCertificateNumber = await GenerateCertificatesNumber(
       [_find.duration],
-      _findStudent.admdate,
+      _findStudent.admdate
     );
 
     res.status(200).json({ error: false, createCertificateNumber });
