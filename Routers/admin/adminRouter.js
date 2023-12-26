@@ -113,17 +113,11 @@ const instructorProfile = require("../../multer/admin/InsructorProfile");
 const Admin_upload = require("../../multer/admin/Amin_upload");
 const joininstructor_upload = require("../../multer/admin/joininstructor_upload");
 
-Router.route("/joininstructor").post(
-  joininstructor_upload.single("cv"),
-  createJoinAsInstructor
-);
+Router.route("/joininstructor").post(createJoinAsInstructor);
 Router.route("/joininstructor").get(getJoinAsInstructor);
 Router.route("/joininstructor/:_id").get(getSingleJoinAsInstructor);
 Router.route("/joininstructor/:_id").delete(delJoinAsInstructor);
-Router.route("/joininstructor/:_id").put(
-  joininstructor_upload.single("cv"),
-  putJoinAsInstructor
-);
+Router.route("/joininstructor/:_id").put(putJoinAsInstructor);
 
 ///role permission section
 Router.route("/permission/:_id").put(putrolepermission);
