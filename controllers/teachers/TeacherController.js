@@ -822,8 +822,6 @@ const DeleteExamReciept = async (req, res) => {
 const GenerateReceiptPDF = async (req, res) => {
   const data = req.body;
   try {
-    console.log("Received data:", data);
-
     const newData = {
       regno: data.regno,
       name: data.name,
