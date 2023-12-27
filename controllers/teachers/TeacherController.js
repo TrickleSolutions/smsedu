@@ -4,6 +4,7 @@ const Sheduleclass_Schema = require("../../models/Teacher/Schedule_Class");
 const assignment_Schema = require("../../models/Teacher/Add_Assignment");
 const AddFeeSchema = require("../../models/Teacher/Add_fee");
 const crypto = require("crypto");
+const Handlebars = require("handlebars");
 const Functions = require("../../library/functions");
 const nodemailer = require("nodemailer");
 const EventsSchema = require("../../models/Teacher/Events");
@@ -17,6 +18,7 @@ const COurseContentVedioSchema = require("../../models/Teacher/CourseConent_vadi
 const VerifyModel = require("../../models/VerifyModel");
 const GenerateRecieptId = require("../../funcs/RecieptNumbergenerater");
 const ExamFeeRecieptModel = require("../../models/Teacher/ExamFeeReciept");
+const Reciept = require("./invoice");
 // const loginInstructor=async(req,resp,next)=>{
 //     try {
 //       const email = req.body.email;
@@ -326,9 +328,8 @@ const getAssignment = async (req, res) => {
   res.send(data);
 };
 const createAssignment = async (req, res) => {
-  const { title, instructions, due_date, contact_instructor } = req.body;
-  let upload = req.file.filename;
-  console.log(upload);
+  const { title, instructions, due_date, contact_instructor, upload } =
+    req.body;
   let data = new assignment_Schema({
     title,
     instructions,
@@ -348,8 +349,8 @@ const createAssignment = async (req, res) => {
 
 const putAssignment = async (req, res) => {
   try {
-    let upload = req.file.filename;
-    const { title, instructions, due_date, contact_instructor } = req.body;
+    const { title, instructions, due_date, contact_instructor, upload } =
+      req.body;
 
     let data = await assignment_Schema.updateOne(
       { contact_instructor: req.params.contact_instructor },
@@ -817,7 +818,142 @@ const DeleteExamReciept = async (req, res) => {
   }
 };
 
+// Generate the reciept
+const GenerateReceiptPDF = async (req, res) => {
+  const data = req.body;
+  try {
+    console.log("Received data:", data);
+
+    const newData = {
+      regno: data.regno,
+      name: data.name,
+      fname: data.fname,
+      recieptid: data.recieptid,
+      course: data.course,
+      srno: data.srno,
+      course_amount: data.course_amount,
+      currentdate: data.currentdate,
+      totalCourseAmount: data.totalCourseAmount,
+      totalAmount: data.totalAmount,
+    };
+
+    console.log("New data:", newData);
+
+    const template = await Handlebars.compile(`
+    <html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} Reciept {{currentdate}}</title>
+
+</head>
+
+<body>
+    <div style="padding: 20px; max-width: 100%; margin: auto auto;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
+      <div style="display: flex; justify-content: center; align-items: start;">
+        <div style="margin: 2px; justify-content: center; width: fit-content;">
+          <h3 style="font-size: 0.875rem; line-height: 1.25rem;">
+            ISO Certified : 9001:2008
+          </h3>
+          <img
+            src="https://server.smseducations.com/1702719806132-443488112SMS-PNG-LOGO.png"
+            style="width: 80px; height: 80px;"
+          />
+        </div>
+        <div style="margin: 4px; text-align: center; font-size: 1.25rem;">
+          <h1 style=" margin-bottom: 10px; font-size: 3rem; line-height: 1;">
+            SMS Education
+          </h1>
+          <h3 style="margin: 2px">Opp. Laxman Nursery, Gauri Sarojini Nagar</h3>
+          <h3 style="margin-top: 8px; margin-bottom: 8px; ">
+            Lucknow - 226008
+          </h3>
+          <h3 style="margin-top: 8px; margin-bottom: 8px;">
+            Email : <span>smseducationlko@gmail.com</span>
+          </h3>
+        </div>
+        <div style="margin: 0.5rem; text-align: center;">
+          <h3>ISO Certified : 9001:2008</h3>
+          <img
+            src="https://server.smseducations.com/1702719806132-443488112SMS-PNG-LOGO.png"
+            style="width: 80px; height: 80px;"
+          />
+        </div>
+      </div>
+
+      <h2 style="font-size: large; text-align: center; margin-top: 8px;">
+        Fee Receipt
+      </h2>
+
+      <div style="margin-top: 5px; justify-content: space-between; display: flex; border-bottom: 1px solid #000; font-weight: 800;">
+        <div style="margin: 12px;">
+          <div style="display: flex;">
+            <div style="font-size: large; width: 19rem;">Registration No: {{regno}}</div>
+          </div>
+
+          <div style="display: flex;">
+            <div style="font-size: large; width: 19rem;">Name: {{name}}</div>
+          </div>
+
+          <div style="display: flex;">
+            <div style="font-size: large; width: 19rem;">Father's Name: {{fname}}</div>
+          </div>
+        </div>
+
+        <div style="margin: 12px;">
+          <div style="display: flex;">
+            <div style="font-size: large; width: 19rem;">Receipt Id :</div>
+            <div>{{recieptid}}</div>
+          </div>
+
+          <div style="display: flex;">
+            <div style="font-size: large; width: 19rem;">Date :</div>
+            <div>{{currentdate}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; margin: auto;"></div>
+      <div style="display: flex; justify-content: space-between; border: black; font-size: small; padding-left: 8px; padding-top: 8px; font-weight: 700;">
+        <div>Sr. No.</div>
+        <div>Course</div>
+        <div>Amount</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; border: black; font-size: small; padding-left: 8px; padding-top: 8px;border-bottom: 1px solid #000">
+        <div>{{srno}}</div>
+        <div>{{course}}</div>
+        <div>{{course_amount}}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; border: black; font-size: small; padding-left: 8px; padding-top: 8px; border-bottom: 1px solid #000;">
+        <div style="margin-left: 40px;">Total</div>
+        <div></div>
+        <div>{{totalAmount}}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: small; margin-top: 4px;">
+        <div>
+          <span style="font-size:large;"></span>
+          Print Date & Time :{" "}
+          <span>{moment().format("MMMM Do YYYY, h:mm:ss a")}</span>
+        </div>
+        <div style="font-size: large;">SMS Education</div>
+      </div>
+    </div>
+    </body>
+
+</html>
+`);
+    const generateddata = await template(newData);
+
+    res.send(generateddata);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  GenerateReceiptPDF,
   CreateExamReciept,
   UpdateExamReciept,
   GenerateRecieptID,

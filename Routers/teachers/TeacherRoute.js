@@ -71,6 +71,8 @@ const {
   UpdateExamReciept,
   GetAllExamReciept,
   DeleteExamReciept,
+  GenerateRecieptPDf,
+  GenerateReceiptPDF,
 } = require("../../controllers/teachers/TeacherController");
 /**fee */
 
@@ -167,15 +169,8 @@ Router.route("/marks/:regno").get(getsingleResult);
 /**ADD ASSignmenyt */
 
 //  Router.route('/assign').post(assignment_upload.single('upload',{name:"upload"}),createAssignment);
-Router.post(
-  "/assign",
-  assignment_upload.single("upload", { name: "upload" }),
-  createAssignment
-);
-Router.route("/assign/:contact_instructor").put(
-  assignment_upload.single("upload"),
-  putAssignment
-);
+Router.post("/assign", createAssignment);
+Router.route("/assign/:contact_instructor").put(putAssignment);
 Router.route("/assign/:contact_instructor").delete(delAssignment);
 Router.route("/assign").get(getAssignment);
 
@@ -186,5 +181,7 @@ Router.route("/reciept/create").post(CreateExamReciept);
 Router.route("/reciept/update/:id").patch(UpdateExamReciept);
 Router.route("/reciept/get").get(GetAllExamReciept);
 Router.route("/reciept/delete/:id").delete(DeleteExamReciept);
+
+Router.route("/generate/reciept").post(GenerateReceiptPDF);
 
 module.exports = Router;
