@@ -29,7 +29,10 @@ const InstructorRegisterSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
+  doj: {
+    type: Date,
+    default: new Date(),
+  },
   degree: {
     type: String,
     required: false,
@@ -51,10 +54,10 @@ const InstructorRegisterSchema = new mongoose.Schema({
     default: "user.jfif",
   },
 
-  aadhar:{
-    type:String,
-    default:'user.jfif'
-  },  
+  aadhar: {
+    type: String,
+    default: "user.jfif",
+  },
   salary: {
     type: String,
     required: true,
