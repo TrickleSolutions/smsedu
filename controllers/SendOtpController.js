@@ -30,17 +30,18 @@ module.exports = async (req, res) => {
     const otp = generateOTP();
     const generatedString = msgFormat(number, otp);
 
-    const smsApiUrl = "http://sms.stewindia.com/sms-panel/api/http/sendsms.php?";
+    const smsApiUrl =
+      "http://sms.stewindia.com/sms-panel/api/http/sendsms.php?";
     const response = await axios.get(smsApiUrl + generatedString);
     // console.log(smsApiUrl + generatedString);
-    console.log(response.data)
 
     if (response.status === 200) {
       const isReqStored = await new VerifyModel({
         otp: otp,
-        otpid: response["message-id"],
+        otpid: `${response.data["message-id"]}`,
         otpExpireTime: Date.now() + 40000,
       }).save();
+      console.log(isReqStored);
       if (!isReqStored) {
         return res
           .status(400)

@@ -83,6 +83,7 @@ const createSt = async (req, resp, next) => {
 
 const loginSt = async (req, res) => {
   const { contact, otp, otpid } = req.query;
+  console.log(contact, otp, otpid);
 
   try {
     if (!contact || !otp || !otpid)
