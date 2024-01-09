@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
+const GenerateRecieptId = require("../../funcs/RecieptNumbergenerater");
 const AddFeeSchema = new mongoose.Schema(
   {
     regno: {
       type: Number,
+      required: true,
+    },
+    recieptNo: {
+      type: String,
       required: true,
     },
     name: {
@@ -41,6 +46,10 @@ const AddFeeSchema = new mongoose.Schema(
     instructor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "instructorregisters",
+    },
+    recievedBy: {
+      type: String,
+      required: true,
     },
   },
   {

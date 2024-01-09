@@ -207,41 +207,67 @@ const gettotalpaidFee = async (req, res) => {
   /*  RESULT SECTION */
 }
 const createResult = async (req, res) => {
-  const { name, regno, course, topic, total_marks, obtain_marks } = req.body;
-  let data = new resultSchema({
-    name,
-    regno,
-    course,
-    topic,
-    total_marks,
-    obtain_marks,
-  });
+  const data = req.body;
+  try {
+    // file the already final result is uploaded or not
+    const uploaded = await resultSchema.findOne({
+      regno: data?.regno,
+      course: data?.course,
+      resultType: "final",
+    });
 
-  let result = await data.save();
-  res.status(200).json({
-    code: 200,
-    message: "  Result Created successfully",
-    error: false,
-    status: true,
-  });
+    if (uploaded)
+      return res.status(409).json({
+        error: true,
+        message: "already final result upload of this course for this student",
+      });
+
+    const response = await new resultSchema(data).save();
+    if (!response)
+      return res
+        .status(404)
+        .json({ error: true, message: "result not created" });
+
+    res.status(200).json({
+      code: 200,
+      message: "  Result Created successfully",
+      error: false,
+      status: true,
+    });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
 };
 
 const putResult = async (req, res) => {
+  const { regno } = req.params;
   try {
-    const { name, regno, course, topic, total_marks, obtain_marks } = req.body;
+    const formdata = req.body;
+    const [uploaded, findData] = await Promise.all([
+      resultSchema.findOne({
+        regno: formdata?.regno,
+        course: formdata?.course,
+        resultType: "final",
+      }),
+      resultSchema.findOne({
+        regno: regno,
+      }),
+    ]);
 
-    let data = await resultSchema.updateOne(
-      { regno: req.params.regno },
-      {
-        $set: {
-          name,
-          regno,
-          course,
-          topic,
-          total_marks,
-          obtain_marks,
-        },
+    if (uploaded) {
+      if (uploaded.regno !== findData.regno) {
+        if (formdata?.resultType === "final")
+          return res.status(409).json({
+            error: true,
+            message: "already final result for this course is uploaded ",
+          });
       }
+    }
+
+    const data = await resultSchema.findByIdAndUpdate(
+      { _id: findData?._id },
+      { ...formdata },
+      { new: true }
     );
     res.send(data);
   } catch (err) {
@@ -715,9 +741,11 @@ const GetCreateFee = async (req, res) => {
     pending_amount = data.courseFee - data.paid;
   }
   try {
+    const recieptNo = await GenerateRecieptId();
     const response = await new AddFeeSchema({
       ...data,
       pending: pending_amount,
+      recieptNo: recieptNo,
     }).save();
     if (!response)
       return res
@@ -745,9 +773,32 @@ const GetDeleteFee = async (req, res) => {
 };
 
 const GetAllThFeeData = async (req, res) => {
-  const data = req.query;
+  const { regno } = req.query;
+
+  const _find = regno ? { regno: parseInt(regno) } : {};
   try {
-    const response = await AddFeeSchema.find(data).sort({ createdAt: -1 });
+    const response = await AddFeeSchema.aggregate([
+      { $match: _find },
+      {
+        $lookup: {
+          from: "course_admins",
+          localField: "course",
+          foreignField: "_id",
+          as: "course",
+        },
+      },
+      {
+        $lookup: {
+          from: "instructorregisters",
+          localField: "instructor",
+          foreignField: "_id",
+          as: "instructor",
+        },
+      },
+      { $unwind: "$course" },
+      { $unwind: "$instructor" },
+      { $sort: { createdAt: -1 } },
+    ]);
     if (!response)
       return res.status(404).json({ error: true, message: "no data found" });
     res.status(200).json({ error: false, message: "success", data: response });

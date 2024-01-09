@@ -4,6 +4,11 @@ const result_Schema = new mongoose.Schema({
     type: String,
     // required: true,
   },
+  resultType: {
+    type: String,
+    enum: ["other", "surprise", "module", "final"],
+    default: "other",
+  },
   regno: {
     type: Number,
     //   required: true,

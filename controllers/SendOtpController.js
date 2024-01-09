@@ -14,7 +14,7 @@ const msgFormat = (number, otp) => {
     apirequest: "Text",
     sender: "STEWIN",
     mobile: number,
-    message: `Dear User Your One time password for Login is ${otp} Valid till 4 Minutes STEWINDIA `,
+    message: `Dear User Your One time password for Login is ${otp} Valid till 5 Minutes STEWINDIA `,
     route: "TRANS",
   };
 
