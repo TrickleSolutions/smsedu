@@ -1,4 +1,4 @@
-const axios = require("axios");
+const { default: axios } = require("axios");
 const VerifyModel = require("../models/VerifyModel");
 
 function generateOTP() {
@@ -9,14 +9,13 @@ function generateOTP() {
 
 const msgFormat = (number, otp) => {
   const query = {
-    user: "trickle",
-    key: "e88ba9a618XX",
-    accusage: "1",
-    entityid: "1201159543060917386",
+    username: "demostew",
+    apikey: "2B8F7-8B25D",
+    apirequest: "Text",
+    sender: "STEWIN",
     mobile: number,
-    senderid: "OTPSSS",
-    tempid: "1207161729866691748",
-    message: `Dear Customer, Your OTP is ${otp} .Please do not share this OTP. Regards`,
+    message: `Dear User Your One time password for Login is ${otp} Valid till 4 Minutes STEWINDIA `,
+    route: "TRANS",
   };
 
   // Convert it to the query string
@@ -31,13 +30,15 @@ module.exports = async (req, res) => {
     const otp = generateOTP();
     const generatedString = msgFormat(number, otp);
 
-    const smsApiUrl = "http://sms.bulkssms.com/submitsms.jsp?";
+    const smsApiUrl = "http://sms.stewindia.com/sms-panel/api/http/sendsms.php?";
     const response = await axios.get(smsApiUrl + generatedString);
+    // console.log(smsApiUrl + generatedString);
+    console.log(response.data)
 
     if (response.status === 200) {
       const isReqStored = await new VerifyModel({
         otp: otp,
-        otpid: response.data,
+        otpid: response["message-id"],
         otpExpireTime: Date.now() + 40000,
       }).save();
       if (!isReqStored) {
@@ -45,13 +46,11 @@ module.exports = async (req, res) => {
           .status(400)
           .json({ error: true, message: "Failed to send OTP" });
       }
-      res
-        .status(200)
-        .json({
-          error: false,
-          message: "OTP sent successfully",
-          data: isReqStored.otpid,
-        });
+      res.status(200).json({
+        error: false,
+        message: "OTP sent successfully",
+        data: isReqStored.otpid,
+      });
     } else {
       res
         .status(response.status)
