@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const result_Schema = new mongoose.Schema({
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "student_registers ",
+  },
   name: {
     type: String,
     // required: true,
