@@ -73,6 +73,10 @@ const {
   DeleteExamReciept,
   GenerateRecieptPDf,
   GenerateReceiptPDF,
+  CreateTypingResult,
+  UpdateTypingResult,
+  DeletetheTypingResult,
+  GetTheTypingResult,
 } = require("../../controllers/teachers/TeacherController");
 /**fee */
 
@@ -183,5 +187,11 @@ Router.route("/reciept/get").get(GetAllExamReciept);
 Router.route("/reciept/delete/:id").delete(DeleteExamReciept);
 
 Router.route("/generate/reciept").post(GenerateReceiptPDF);
+
+// exam Routes
+Router.route("/typing-result/create").post(CreateTypingResult);
+Router.route("/typing-result/get").get(GetTheTypingResult);
+Router.route("/typing-result/update/:id").patch(UpdateTypingResult);
+Router.route("/typing-result/delete/:id").delete(DeletetheTypingResult);
 
 module.exports = Router;

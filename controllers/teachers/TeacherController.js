@@ -19,6 +19,7 @@ const VerifyModel = require("../../models/VerifyModel");
 const GenerateRecieptId = require("../../funcs/RecieptNumbergenerater");
 const ExamFeeRecieptModel = require("../../models/Teacher/ExamFeeReciept");
 const Reciept = require("./invoice");
+const TypingModel = require("../../models/Teacher/TypingResult");
 // const loginInstructor=async(req,resp,next)=>{
 //     try {
 //       const email = req.body.email;
@@ -1001,7 +1002,76 @@ const GenerateReceiptPDF = async (req, res) => {
   }
 };
 
+// Typing result creation
+
+const CreateTypingResult = async (req, res) => {
+  try {
+    const response = await new TypingModel(req.body).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "required field data is missing" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateTypingResult = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await TypingModel.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+      },
+      { new: true }
+    );
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeletetheTypingResult = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const _delete = id.toLowerCase() === "all" ? {} : { _id: id };
+
+    const response = await TypingModel.deleteMany(_delete);
+    if (response.deletedCount === 0)
+      return res
+        .status(404)
+        .json({ error: true, message: "no data found to delete" });
+    res.status(200).json({ error: false, message: "deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetTheTypingResult = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const _find = id ? { _id: id } : {};
+    const response = await TypingModel.find(_find);
+    if (!response)
+      return res.status(404).json({ error: true, message: "no data found" });
+    res.status(200).json({ error: true, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  CreateTypingResult,
+  UpdateTypingResult,
+  DeletetheTypingResult,
+  GetTheTypingResult,
   GenerateReceiptPDF,
   CreateExamReciept,
   UpdateExamReciept,
