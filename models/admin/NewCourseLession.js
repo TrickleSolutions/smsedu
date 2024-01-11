@@ -29,15 +29,17 @@ const schema = new Schema(
       daycounts: {
         type: Number,
         default: function () {
-          return this.topic.length;
+          return this.topic?.length;
         },
       },
     },
     topic: [TopicSchema],
-    instructorList: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref:""
-    },
+    instructorList: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "instructorregisters",
+      },
+    ],
   },
   {
     timestamps: true,
