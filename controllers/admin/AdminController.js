@@ -21,6 +21,9 @@ const GenerateCertificatesNumber = require("../../funcs/generateCertificateNumbe
 const CourseLessionModel = require("../../models/admin/courseLessions");
 const HolidayModel = require("../../models/admin/Holiday");
 const DayByDayModel = require("../../models/admin/DayByDay");
+const NewCourseLessionSchema = require("../../models/admin/NewCourseLession");
+const SliderModel = require("../../models/admin/HomeSliderModel");
+const NewDayByDayModel = require("../../models/admin/newDayByday");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1738,7 +1741,277 @@ const UpdateDayByDay = async (req, res) => {
   }
 };
 
+// ============ New Lession Plans  = ===========================
+
+const NewLessionPlanCreate = async (req, res) => {
+  const { courseid } = req.params;
+  const formData = req.body;
+
+  try {
+    const response = await new NewCourseLessionSchema({
+      ...formData,
+      course: courseid,
+    }).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+async function NewLessionPlanUpdate(req, res) {
+  try {
+    const data = req.body;
+    const { id } = req.params;
+    const _update = await NewCourseLessionSchema.findByIdAndUpdate(
+      id,
+      { ...data },
+      { new: true }
+    );
+    if (!_update)
+      return res
+        .status(400)
+        .json({ error: true, message: "updation failed try again " });
+    res.status(200).json({ error: false, message: "success", data: _update });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+async function NewLessionPlanDelete(req, res) {
+  const { id } = req.params;
+  try {
+    const _delete = id.toLowerCase() === "all" ? {} : { _id: id };
+    const response = await NewCourseLessionSchema.deleteMany(_delete);
+    if (response.deletedCount === 0)
+      return res
+        .status(404)
+        .json({ error: true, message: "No data found to delete" });
+    res.status(200).json({ error: false, message: "deleted successfully " });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+async function NewLessionPlanGet(req, res) {
+  const { id, course } = req.query;
+
+  let _find = {};
+  if (id) {
+    _find._id = id;
+  }
+  if (course) {
+    _find.course = course;
+  }
+
+  try {
+    const response = await NewCourseLessionSchema.find(_find);
+    if (!response)
+      return res.status(404).json({ error: true, message: "No data found" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+async function GetLessionByCourse(req, res) {
+  const { courseid } = req.params;
+
+  try {
+    const response = await NewCourseLessionSchema.find({
+      course: courseid,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "No data found with this id " });
+    res.status(500).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+async function NewLessionPlanGetByInstructor(req, res) {
+  const { instructor } = req.params;
+  try {
+    const response = await NewCourseLessionSchema.find({
+      instructorList: { $in: instructor },
+    });
+    if (!response)
+      return res
+        .status(404)
+        .json({ error: true, message: "No Data found with this id " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+//Slider  =================
+
+async function AddInSlider(req, res) {
+  try {
+    const _create = await new SliderModel(req.body).save();
+    if (!_create)
+      return res
+        .status(400)
+        .json({ error: true, message: "Image url Not found" });
+    res.status(200).json({ error: false, message: "success", data: _create });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}
+
+const UpadateSliderImg = async (req, res) => {
+  const { id, img } = req.params;
+  try {
+    const _updated = await SliderModel.findByIdAndUpdate(
+      id,
+      { img: img },
+      { new: true }
+    );
+    if (!_updated)
+      return res.status(400).json({
+        error: true,
+        message: "please check the image url and try again",
+      });
+    res.status(200).json({ error: false, message: "success", data: _updated });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteSliderImg = async (req, res) => {
+  const { id } = req.params;
+  const _delete = id.toLowerCase() === "all" ? {} : { _id: id };
+  try {
+    const response = await SliderModel.deleteMany(_delete);
+    res
+      .status(200)
+      .json({ error: false, message: "success deleted", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetSliderImg = async (req, res) => {
+  const { id, distinct } = req.query;
+
+  try {
+    const _find = id ? { _id: id } : {};
+    // const response = await SliderModel.find(_find).distinct(select);
+    const response = await SliderModel.aggregate([
+      { $match: _find },
+      {
+        $group: {
+          _id: "images",
+          images: { $push: "$img" },
+        },
+      },
+    ]);
+    res
+      .status(200)
+      .json({ error: false, message: "success", data: response[0] });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+// New Day by day ==========================================
+const CreateDaybyDayPlan = async (req, res) => {
+  try {
+    const response = await new NewDayByDayModel(req.body).save();
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials " });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateDayByDayPlan = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const response = await NewDayByDayModel.findByIdAndUpdate(
+      id,
+      { ...data },
+      { new: true }
+    );
+
+    if (!response)
+      return res.status(400).json({
+        error: true,
+        message: "missing credentials ! error in updating",
+      });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteNewDayByDayPlan = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await NewDayByDayModel.findByIdAndDelete(id);
+    if (!response)
+      return res
+        .status(404)
+        .json({ error: true, message: "no data found with this id to delete" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllDayByDay = async (req, res) => {
+  const { course } = req.query;
+  try {
+    const response = await NewDayByDayModel.aggregate([
+      {
+        $lookup: {
+          from: "new_course_lessions",
+          localField: "plan.theory",
+          foreignField: "topic._id",
+          as: "plansdata",
+        },
+      },
+      {
+        $project: {
+          course: 1,
+          plan: 1,
+          plansData: { $arrayElemAt: ["$plansdata.topic", 0] },
+        },
+      },
+    ]);
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 module.exports = {
+  // New Day By Day ===================
+  CreateDaybyDayPlan,
+  UpdateDayByDayPlan,
+  DeleteNewDayByDayPlan,
+  GetAllDayByDay,
+  // Slider ====================================
+  AddInSlider,
+  UpadateSliderImg,
+  DeleteSliderImg,
+  GetSliderImg,
+  // New Create lessions APi ====================================
+  NewLessionPlanCreate,
+  NewLessionPlanUpdate,
+  NewLessionPlanDelete,
+  NewLessionPlanGet,
+  GetLessionByCourse,
+  NewLessionPlanGetByInstructor,
   // Day By day Plan ===========================
   CreateDayByDayPlan,
   DeleteDayByDayPlan,

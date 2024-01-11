@@ -104,6 +104,20 @@ const {
   DeleteDayByDayPlan,
   GetDayByDay,
   UpdateDayByDay,
+  NewLessionPlanCreate,
+  NewLessionPlanUpdate,
+  NewLessionPlanDelete,
+  NewLessionPlanGet,
+  GetLessionByCourse,
+  NewLessionPlanGetByInstructor,
+  AddInSlider,
+  UpadateSliderImg,
+  DeleteSliderImg,
+  GetSliderImg,
+  CreateDaybyDayPlan,
+  UpdateDayByDayPlan,
+  DeleteNewDayByDayPlan,
+  GetAllDayByDay,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -255,5 +269,29 @@ Router.route("/day-by-day/create").post(CreateDayByDayPlan);
 Router.route("/day-by-day/update/:id").patch(UpdateDayByDay);
 Router.route("/day-by-day/get").get(GetDayByDay);
 Router.route("/day-by-day/delete/:id").delete(DeleteDayByDayPlan);
+
+// New Create Lessions
+Router.route("/course/new-lession/:courseid").post(NewLessionPlanCreate);
+Router.route("/course/new-lession/update/:id").patch(NewLessionPlanUpdate);
+Router.route("/course/new-lession/delete/:id").delete(NewLessionPlanDelete);
+Router.route("/course/new-lession/get").get(NewLessionPlanGet);
+Router.route("/course/new-lession/getbycourse/:courseid").get(
+  GetLessionByCourse
+);
+Router.route("/course/new-lession/getbyinstructor/:instructor").get(
+  NewLessionPlanGetByInstructor
+);
+
+// Home slider  ==============
+Router.route("/slider/add").post(AddInSlider);
+Router.route("/slider/update/:id/:img").patch(UpadateSliderImg);
+Router.route("/slider/delete/:id").delete(DeleteSliderImg);
+Router.route("/slider/get").get(GetSliderImg);
+
+// ====================== New DayByDay
+Router.route("/new-daybyday/create").post(CreateDaybyDayPlan);
+Router.route("/new-daybyday/update/:id").patch(UpdateDayByDayPlan);
+Router.route("/new-daybyday/delete/:id").delete(DeleteNewDayByDayPlan);
+Router.route("/new-daybyday/get").get(GetAllDayByDay);
 
 module.exports = Router;
