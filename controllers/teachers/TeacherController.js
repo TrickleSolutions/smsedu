@@ -20,6 +20,7 @@ const GenerateRecieptId = require("../../funcs/RecieptNumbergenerater");
 const ExamFeeRecieptModel = require("../../models/Teacher/ExamFeeReciept");
 const Reciept = require("./invoice");
 const TypingModel = require("../../models/Teacher/TypingResult");
+const { default: mongoose } = require("mongoose");
 // const loginInstructor=async(req,resp,next)=>{
 //     try {
 //       const email = req.body.email;
@@ -1057,8 +1058,19 @@ const DeletetheTypingResult = async (req, res) => {
 const GetTheTypingResult = async (req, res) => {
   try {
     const { id } = req.query;
-    const _find = id ? { _id: id } : {};
-    const response = await TypingModel.find(_find);
+    const _find = id ? { _id: new mongoose.Types.ObjectId(id) } : {};
+    const response = await TypingModel.aggregate([
+      { $match: _find },
+      {
+        $lookup: {
+          from: "student_registers",
+          foreignField: "_id",
+          localField: "student",
+          as: "student",
+        },
+      },
+      { $unwind: "$student" },
+    ]);
     if (!response)
       return res.status(404).json({ error: true, message: "no data found" });
     res.status(200).json({ error: true, message: "success", data: response });
