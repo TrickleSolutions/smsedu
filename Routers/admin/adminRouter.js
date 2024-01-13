@@ -294,4 +294,10 @@ Router.route("/new-daybyday/update/:id").patch(UpdateDayByDayPlan);
 Router.route("/new-daybyday/delete/:id").delete(DeleteNewDayByDayPlan);
 Router.route("/new-daybyday/get").get(GetAllDayByDay);
 
+
+
+// Cash ledger Cashsbook Routes  
+
+Router.route("")
+
 module.exports = Router;
