@@ -118,6 +118,13 @@ const {
   UpdateDayByDayPlan,
   DeleteNewDayByDayPlan,
   GetAllDayByDay,
+  AddNewDataCashbook,
+  AddTheTransaction,
+  UpdateTransaction,
+  DeleteTransaction,
+  GetAllTransaction,
+  GetAllCashbook,
+  ChangeTheStatusOfTransaction,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -126,6 +133,10 @@ const instructorofmonth_upload = require("../../multer/admin/Instructorofmonth")
 const instructorProfile = require("../../multer/admin/InsructorProfile");
 const Admin_upload = require("../../multer/admin/Amin_upload");
 const joininstructor_upload = require("../../multer/admin/joininstructor_upload");
+const {
+  handleCashbook,
+  HandleCascade,
+} = require("../../middlewares/cashbooks/CashbookHandle");
 
 Router.route("/joininstructor").post(createJoinAsInstructor);
 Router.route("/joininstructor").get(getJoinAsInstructor);
@@ -294,10 +305,27 @@ Router.route("/new-daybyday/update/:id").patch(UpdateDayByDayPlan);
 Router.route("/new-daybyday/delete/:id").delete(DeleteNewDayByDayPlan);
 Router.route("/new-daybyday/get").get(GetAllDayByDay);
 
+// Cash ledger Cashsbook Routes
 
-
-// Cash ledger Cashsbook Routes  
-
-Router.route("")
+Router.route("/cashbook/create-new").post(AddNewDataCashbook);
+Router.route("/cashbook/get").get(GetAllCashbook);
+// Router.route("/cashbook/transaction/add/:year").post(
+//   handleCashbook,
+//   AddTheTransaction
+// );
+Router.post(
+  "/cashbook/transaction/add/:year",
+  handleCashbook,
+  HandleCascade,
+  AddTheTransaction
+);
+Router.route("/cashbook/transaction/delete/:id").delete(
+  HandleCascade,
+  DeleteTransaction
+);
+Router.route("/cashbook/transaction/get").get(GetAllTransaction);
+Router.route("/cashbook/transaction/status/:id").patch(
+  ChangeTheStatusOfTransaction
+);
 
 module.exports = Router;

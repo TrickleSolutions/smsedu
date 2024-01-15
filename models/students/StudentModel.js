@@ -67,6 +67,7 @@ const Student_RegisterSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["active", "break", "completed"],
       default: "active",
     },
     aadhar_pan: {

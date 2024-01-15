@@ -21,6 +21,7 @@ const ExamFeeRecieptModel = require("../../models/Teacher/ExamFeeReciept");
 const Reciept = require("./invoice");
 const TypingModel = require("../../models/Teacher/TypingResult");
 const { default: mongoose } = require("mongoose");
+const StudentModel = require("../../models/students/StudentModel");
 // const loginInstructor=async(req,resp,next)=>{
 //     try {
 //       const email = req.body.email;
@@ -1079,7 +1080,28 @@ const GetTheTypingResult = async (req, res) => {
   }
 };
 
+const UpdateStudentStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.query;
+  try {
+    const update = await StudentModel.findByIdAndUpdate(
+      id,
+      { status: status },
+      { new: true }
+    );
+    if (!update)
+      return res.status(400).json({
+        error: true,
+        message: "accepts only [ active, break, completed]",
+      });
+    res.status(200).json({ error: false, message: "success" });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  UpdateStudentStatus,
   CreateTypingResult,
   UpdateTypingResult,
   DeletetheTypingResult,

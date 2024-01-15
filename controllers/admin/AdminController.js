@@ -24,6 +24,8 @@ const DayByDayModel = require("../../models/admin/DayByDay");
 const NewCourseLessionSchema = require("../../models/admin/NewCourseLession");
 const SliderModel = require("../../models/admin/HomeSliderModel");
 const NewDayByDayModel = require("../../models/admin/newDayByday");
+const CashbookModel = require("../../models/admin/Cashbook");
+const TransactionsModel = require("../../models/admin/transactions");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1994,7 +1996,147 @@ const GetAllDayByDay = async (req, res) => {
     res.status(500).json({ error: true, message: error.message });
   }
 };
+
+//  ==========================Create new Setup ======================
+const AddNewDataCashbook = async (req, res) => {
+  const body = req.body;
+
+  try {
+    const response = await new CashbookModel(body).save();
+
+    if (!response)
+      return res
+        .stutus(400)
+        .json({ error: true, message: "missing some required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllCashbook = async (req, res) => {
+  try {
+    const response = await CashbookModel.find({});
+
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const AddTheTransaction = async (req, res) => {
+  const { year } = req.params;
+  const formdata = req.body;
+  const cashbook = req.Cashbook;
+  try {
+    const _add = await new TransactionsModel(formdata).save();
+    if (!_add)
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required Credentials" });
+
+    const data = await TransactionsModel.aggregate([
+      { $match: {} },
+      {
+        $group: {
+          _id: "$incomeType",
+          sum: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    await CashbookModel.findOneAndUpdate(
+      { year: year },
+      {
+        $push: {
+          transactions: _add._id,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({ error: false, message: "success", data: _add });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const DeleteTransaction = async (req, res) => {
+  const { id } = req.params;
+  const cashbook = req.Cashbook;
+  try {
+    const response = await TransactionsModel.findByIdAndDelete(id);
+    const updatedCashbook = await CashbookModel.findOneAndUpdate(
+      { year: cashbook.year },
+      { $pull: { transactions: response._id } },
+      { new: true }
+    );
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const UpdateTransaction = async (req, res) => {
+  const { id, year } = req.params;
+  const data = req.body;
+
+  try {
+    const response = await TransactionsModel.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "missing required credentials" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllTransaction = async (req, res) => {
+  const { type } = req.query;
+
+  try {
+    const _find = type ? { incomeType: type } : {};
+    const _getAll = await TransactionsModel.find(_find);
+    res.status(200).json({ error: true, message: "success", data: _getAll });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const ChangeTheStatusOfTransaction = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.query;
+  try {
+    const response = await TransactionsModel.findByIdAndUpdate(
+      id,
+      {
+        approved: status,
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  ChangeTheStatusOfTransaction,
+  // Casbookin and transaction route ===========
+  AddNewDataCashbook,
+  GetAllCashbook,
+  AddTheTransaction,
+  DeleteTransaction,
+  UpdateTransaction,
+  GetAllTransaction,
+
   // New Day By Day ===================
   CreateDaybyDayPlan,
   UpdateDayByDayPlan,
