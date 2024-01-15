@@ -27,6 +27,9 @@ const {
 } = require("../../controllers/students/StudentController");
 const tast_assignment_upload = require("../../multer/students/task_upload");
 const studentProfile_upload = require("../../multer/students/StudentProfile");
+const {
+  UpdateStudentStatus,
+} = require("../../controllers/teachers/TeacherController");
 
 Router.route("/enroll").post(createEnrollCorses);
 Router.route("/enroll").get(getEnrollCorses);
@@ -37,6 +40,8 @@ Router.route("/enroll/:_id").delete(delEnrollCorses);
 Router.route("/students").post(createSt);
 Router.route("/students").get(getSt);
 Router.route("/students/:_id").get(getsingleSt);
+// update the student status
+Router.route("/students/status/:id").get(UpdateStudentStatus);
 // Router.route("/students/:_id").put(putSt);
 Router.route("/students/:_id").patch(getUpdateStudent);
 Router.route("/students/:_id").delete(delSt);

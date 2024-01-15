@@ -1,54 +1,43 @@
-const { model, Schema } = require('mongoose')
+const { model, Schema, default: mongoose } = require("mongoose");
+const TransactionsModel = require("./transactions");
 
-
-const TransactionsSchema = new Schema({
-    source: {
-        type: String,
-    },
-    incomeType: {
-        type: String,
-        enum: ["dabit", "credit"]
-    },
-    amount: {
-        type: Number,
-    },
-    dateTime: {
-        type: Date
-    }
-})
-
-
-
-const schema = new Schema({
+const schema = new Schema(
+  {
     year: {
-        type: Date,
-        unique: true,
+      type: Number,
+      required: true,
+      unique: true,
     },
     OpeningBalance: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
+      default: 0,
     },
     ClosingBalance: {
-        type: Number,
-        required: true,
+      type: Number,
+      default: 0,
     },
     totalRevenue: {
-        type: Number,
+      type: Number,
+      default: 0,
     },
     totalExpense: {
-        type: Number
+      type: Number,
+      default: 0,
     },
     totalIncome: {
-        type: Number
+      type: Number,
+      default: 0,
     },
-    transactions: [TransactionsSchema]
-}, {
+    transactions: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "transactions" },
+    ],
+  },
+  {
     timestamps: true,
-})
+  }
+);
 
+const CashbookModel = model("cash_ledger", schema);
 
-
-const CashbookModel = model("cash_ledger", schema)
-
-
-module.exports = CashbookModel
+module.exports = CashbookModel;
