@@ -22,8 +22,7 @@ const TransactionsSchema = new Schema(
     approved: {
       type: Boolean,
       default: function () {
-        this.incomeType === "credit";
-        return false;
+        return this.incomeType !== "credit"; // Return true for credit, false otherwise
       },
     },
   },

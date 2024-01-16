@@ -125,6 +125,10 @@ const {
   GetAllTransaction,
   GetAllCashbook,
   ChangeTheStatusOfTransaction,
+  CreateNewFinancialYear,
+  GetTheYearTransactions,
+  GetUnapprovedData,
+  UploadNotesOnLessionPlan,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -289,6 +293,9 @@ Router.route("/course/new-lession/get").get(NewLessionPlanGet);
 Router.route("/course/new-lession/getbycourse/:courseid").get(
   GetLessionByCourse
 );
+Router.route("/course/new-lession/upload/:id/:topicid").get(
+  UploadNotesOnLessionPlan
+);
 Router.route("/course/new-lession/getbyinstructor/:instructor").get(
   NewLessionPlanGetByInstructor
 );
@@ -313,19 +320,19 @@ Router.route("/cashbook/get").get(GetAllCashbook);
 //   handleCashbook,
 //   AddTheTransaction
 // );
-Router.post(
-  "/cashbook/transaction/add/:year",
-  handleCashbook,
-  HandleCascade,
-  AddTheTransaction
-);
-Router.route("/cashbook/transaction/delete/:id").delete(
-  HandleCascade,
+Router.post("/cashbook/create-financial-year/new", CreateNewFinancialYear);
+Router.post("/cashbook/transaction/add/:year", AddTheTransaction);
+Router.route("/cashbook/transaction/delete/:year/:id").delete(
   DeleteTransaction
 );
 Router.route("/cashbook/transaction/get").get(GetAllTransaction);
-Router.route("/cashbook/transaction/status/:id").patch(
+Router.route("/cashbook/transaction/status/:id/:year").get(
   ChangeTheStatusOfTransaction
+);
+
+Router.route("/cashbook/transaction/get/:year").get(GetTheYearTransactions);
+Router.route("/cashbook/transaction/get-unapproved/:year").get(
+  GetUnapprovedData
 );
 
 module.exports = Router;
