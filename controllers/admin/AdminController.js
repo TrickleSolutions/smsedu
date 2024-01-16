@@ -26,6 +26,10 @@ const SliderModel = require("../../models/admin/HomeSliderModel");
 const NewDayByDayModel = require("../../models/admin/newDayByday");
 const CashbookModel = require("../../models/admin/Cashbook");
 const TransactionsModel = require("../../models/admin/transactions");
+const CashBookYearModel = require("../../models/admin/CashLedgerYear");
+const {
+  updateTheCashbook,
+} = require("../../middlewares/cashbooks/CashbookHandle");
 
 function checkEmailOrMobile(inputString) {
   // Regular expression for matching email addresses
@@ -1803,14 +1807,27 @@ async function NewLessionPlanGet(req, res) {
 
   let _find = {};
   if (id) {
-    _find._id = id;
+    _find._id = new mongoose.Types.ObjectId(id);
   }
   if (course) {
-    _find.course = course;
+    _find.course = new mongoose.Types.ObjectId(course);
   }
 
   try {
-    const response = await NewCourseLessionSchema.find(_find);
+    // const response = await NewCourseLessionSchema.find(_find).populate(
+    //   "instructorList"
+    // );
+    const response = await NewCourseLessionSchema.aggregate([
+      { $match: _find },
+      {
+        $lookup: {
+          from: "instructorregisters",
+          localField: "instructorList",
+          foreignField: "_id",
+          as: "instructorList",
+        },
+      },
+    ]);
     if (!response)
       return res.status(404).json({ error: true, message: "No data found" });
     res.status(200).json({ error: false, message: "success", data: response });
@@ -1823,14 +1840,25 @@ async function GetLessionByCourse(req, res) {
   const { courseid } = req.params;
 
   try {
-    const response = await NewCourseLessionSchema.find({
-      course: courseid,
-    });
+    // const response = await NewCourseLessionSchema.find({
+    //   course: courseid,
+    // });
+    const response = await NewCourseLessionSchema.aggregate([
+      { $match: { course: new mongoose.Types.ObjectId(courseid) } },
+      {
+        $lookup: {
+          from: "instructorregisters",
+          localField: "instructorList",
+          foreignField: "_id",
+          as: "instructorList",
+        },
+      },
+    ]);
     if (!response)
       return res
         .status(400)
         .json({ error: true, message: "No data found with this id " });
-    res.status(500).json({ error: false, message: "success", data: response });
+    res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }
@@ -1839,9 +1867,21 @@ async function GetLessionByCourse(req, res) {
 async function NewLessionPlanGetByInstructor(req, res) {
   const { instructor } = req.params;
   try {
-    const response = await NewCourseLessionSchema.find({
-      instructorList: { $in: instructor },
-    });
+    const response = await NewCourseLessionSchema.aggregate([
+      {
+        $match: {
+          instructorList: { $in: new mongoose.Types.ObjectId(instructor) },
+        },
+      },
+      {
+        $lookup: {
+          from: "instructorregisters",
+          localField: "instructorList",
+          foreignField: "_id",
+          as: "instructorList",
+        },
+      },
+    ]);
     if (!response)
       return res
         .status(404)
@@ -1851,6 +1891,26 @@ async function NewLessionPlanGetByInstructor(req, res) {
     res.status(500).json({ error: true, message: error.message });
   }
 }
+
+const UploadNotesOnLessionPlan = async (req, res) => {
+  const { id, topicid } = req.params;
+  const { notesLink } = req.query;
+  try {
+    const response = await NewCourseLessionSchema.findOneAndUpdate(
+      {
+        _id: id,
+        "topic._id": topicid,
+      },
+      { $set: { "topic.$.notes": notesLink } },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({ success: true, data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 
 //Slider  =================
 
@@ -2027,7 +2087,6 @@ const GetAllCashbook = async (req, res) => {
 const AddTheTransaction = async (req, res) => {
   const { year } = req.params;
   const formdata = req.body;
-  const cashbook = req.Cashbook;
   try {
     const _add = await new TransactionsModel(formdata).save();
     if (!_add)
@@ -2035,27 +2094,7 @@ const AddTheTransaction = async (req, res) => {
         .status(400)
         .json({ error: true, message: "Missing required Credentials" });
 
-    const data = await TransactionsModel.aggregate([
-      { $match: {} },
-      {
-        $group: {
-          _id: "$incomeType",
-          sum: { $sum: "$amount" },
-        },
-      },
-    ]);
-
-    await CashbookModel.findOneAndUpdate(
-      { year: year },
-      {
-        $push: {
-          transactions: _add._id,
-        },
-      },
-      {
-        new: true,
-      }
-    );
+    await updateTheCashbook(year);
     res.status(200).json({ error: false, message: "success", data: _add });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
@@ -2063,15 +2102,10 @@ const AddTheTransaction = async (req, res) => {
 };
 
 const DeleteTransaction = async (req, res) => {
-  const { id } = req.params;
-  const cashbook = req.Cashbook;
+  const { id, year } = req.params;
   try {
     const response = await TransactionsModel.findByIdAndDelete(id);
-    const updatedCashbook = await CashbookModel.findOneAndUpdate(
-      { year: cashbook.year },
-      { $pull: { transactions: response._id } },
-      { new: true }
-    );
+    await updateTheCashbook(year);
     res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
@@ -2109,7 +2143,7 @@ const GetAllTransaction = async (req, res) => {
 };
 
 const ChangeTheStatusOfTransaction = async (req, res) => {
-  const { id } = req.params;
+  const { id, year } = req.params;
   const { status } = req.query;
   try {
     const response = await TransactionsModel.findByIdAndUpdate(
@@ -2121,6 +2155,82 @@ const ChangeTheStatusOfTransaction = async (req, res) => {
         new: true,
       }
     );
+    await updateTheCashbook(year);
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const CreateNewFinancialYear = async (req, res) => {
+  try {
+    const formdata = req.body;
+    const _find = await CashBookYearModel.findOne({ year: formdata?.year });
+    if (_find)
+      return res.status(409).json({
+        error: true,
+        message: "already this financial year is created",
+      });
+
+    const Create_ = await new CashBookYearModel(req.body).save();
+    if (!Create_)
+      return res
+        .status(404)
+        .json({ error: true, message: "please fill the required credentials" });
+    res.status(200).json({ error: false, message: "success", data: Create_ });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetTheYearTransactions = async (req, res) => {
+  const { year } = req.params;
+  try {
+    const response = await TransactionsModel.aggregate([
+      {
+        $match: {
+          approved: true,
+          createdAt: {
+            $gte: new Date(`${year}-01-01T00:00:00Z`),
+            $lte: new Date(`${year}-12-31T23:59:59Z`),
+          },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$incomeType",
+          transactions: { $push: "$$ROOT" },
+        },
+      },
+    ]);
+
+    if (!response)
+      return res
+        .status(400)
+        .json({ error: true, message: "No data found this year" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetUnapprovedData = async (req, res) => {
+  const { year } = req.params;
+
+  try {
+    const response = await TransactionsModel.aggregate([
+      {
+        $match: {
+          approved: false,
+          createdAt: {
+            $gte: new Date(`${year}-01-01T00:00:00Z`),
+            $lte: new Date(`${year}-12-31T23:59:59Z`),
+          },
+        },
+      },
+    ]).sort({ createdAt: -1 });
+
     res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
@@ -2128,7 +2238,10 @@ const ChangeTheStatusOfTransaction = async (req, res) => {
 };
 
 module.exports = {
+  CreateNewFinancialYear,
   ChangeTheStatusOfTransaction,
+  GetTheYearTransactions,
+  GetUnapprovedData,
   // Casbookin and transaction route ===========
   AddNewDataCashbook,
   GetAllCashbook,
@@ -2151,6 +2264,7 @@ module.exports = {
   NewLessionPlanCreate,
   NewLessionPlanUpdate,
   NewLessionPlanDelete,
+  UploadNotesOnLessionPlan,
   NewLessionPlanGet,
   GetLessionByCourse,
   NewLessionPlanGetByInstructor,

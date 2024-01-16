@@ -3,6 +3,7 @@ const CashbookModel = require("../../models/admin/Cashbook");
 const joi = require("joi");
 const TransactionsModel = require("../../models/admin/transactions");
 const { default: mongoose } = require("mongoose");
+const CashBookYearModel = require("../../models/admin/CashLedgerYear");
 
 const handleCashbook = async (req, res, next) => {
   try {
@@ -284,4 +285,50 @@ const UpdateStatusValidate = async (body) => {
   return { error: false, message: "success" };
 };
 
-module.exports = { handleCashbook, HandleCascade };
+const updateTheCashbook = async (year) => {
+  try {
+    const incomes = await TransactionsModel.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${year}-01-01T00:00:00Z`),
+            $lte: new Date(`${year}-12-31T23:59:59Z`),
+          },
+          approved: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$incomeType",
+          amount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    console.log(incomes);
+
+    const findIncome = (type) =>
+      incomes?.find((item) => item._id === type)?.amount || 0;
+
+    const totalIncome = findIncome("debit");
+    const totalExpense = findIncome("credit");
+    const totolRevenue = totalIncome - totalExpense;
+
+    const cashbookData = await CashBookYearModel.findOne({ year: year });
+
+    await CashBookYearModel.findOneAndUpdate(
+      { year: year },
+      {
+        totalExpense: totalExpense,
+        totalIncome: totalIncome,
+        totalRevenue: totolRevenue,
+        closingBalance:
+          cashbookData.openingBalance + totalIncome - totalExpense,
+      },
+      { new: true }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+module.exports = { handleCashbook, HandleCascade, updateTheCashbook };
