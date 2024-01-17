@@ -129,6 +129,7 @@ const {
   GetTheYearTransactions,
   GetUnapprovedData,
   UploadNotesOnLessionPlan,
+  GetCashbookReport,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -334,5 +335,6 @@ Router.route("/cashbook/transaction/get/:year").get(GetTheYearTransactions);
 Router.route("/cashbook/transaction/get-unapproved/:year").get(
   GetUnapprovedData
 );
+Router.route("/cashbook/report/:year").get(GetCashbookReport);
 
 module.exports = Router;

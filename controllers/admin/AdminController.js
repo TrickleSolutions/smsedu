@@ -2232,6 +2232,20 @@ const GetUnapprovedData = async (req, res) => {
   }
 };
 
+const GetCashbookReport = async (req, res) => {
+  const { year } = req.params;
+  try {
+    const Response = await CashBookYearModel.findOne({ year: year });
+    if (!Response)
+      return res
+        .status(400)
+        .json({ error: true, message: "no cashbook found this year" });
+    res.status(200).json({ error: true, message: "success", data: Response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   CreateNewFinancialYear,
   ChangeTheStatusOfTransaction,
@@ -2244,6 +2258,7 @@ module.exports = {
   DeleteTransaction,
   UpdateTransaction,
   GetAllTransaction,
+  GetCashbookReport,
 
   // New Day By Day ===================
   CreateDaybyDayPlan,
