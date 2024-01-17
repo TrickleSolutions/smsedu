@@ -2197,12 +2197,6 @@ const GetTheYearTransactions = async (req, res) => {
         },
       },
       { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: "$incomeType",
-          transactions: { $push: "$$ROOT" },
-        },
-      },
     ]);
 
     if (!response)
@@ -2222,14 +2216,15 @@ const GetUnapprovedData = async (req, res) => {
     const response = await TransactionsModel.aggregate([
       {
         $match: {
-          approved: false,
+          incomeType: "credit",
           createdAt: {
             $gte: new Date(`${year}-01-01T00:00:00Z`),
             $lte: new Date(`${year}-12-31T23:59:59Z`),
           },
         },
       },
-    ]).sort({ createdAt: -1 });
+      { $sort: { approved: 1, createdAt: -1 } },
+    ]);
 
     res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
