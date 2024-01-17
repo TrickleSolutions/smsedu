@@ -2236,11 +2236,8 @@ const GetCashbookReport = async (req, res) => {
   const { year } = req.params;
   try {
     const Response = await CashBookYearModel.findOne({ year: year });
-    if (!Response)
-      return res
-        .status(400)
-        .json({ error: true, message: "no cashbook found this year" });
-    res.status(200).json({ error: true, message: "success", data: Response });
+
+    res.status(200).json({ error: false, message: "success", data: Response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }
