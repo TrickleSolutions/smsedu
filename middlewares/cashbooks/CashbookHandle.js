@@ -309,8 +309,8 @@ const updateTheCashbook = async (year) => {
     const findIncome = (type) =>
       incomes?.find((item) => item._id === type)?.amount || 0;
 
-    const totalIncome = findIncome("debit");
-    const totalExpense = findIncome("credit");
+    const totalIncome = findIncome("credit");
+    const totalExpense = findIncome("debit");
     const totolRevenue = totalIncome - totalExpense;
 
     const cashbookData = await CashBookYearModel.findOne({ year: year });
