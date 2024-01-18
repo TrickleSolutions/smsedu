@@ -2216,7 +2216,7 @@ const GetUnapprovedData = async (req, res) => {
     const response = await TransactionsModel.aggregate([
       {
         $match: {
-          incomeType: "credit",
+          incomeType: "debit",
           createdAt: {
             $gte: new Date(`${year}-01-01T00:00:00Z`),
             $lte: new Date(`${year}-12-31T23:59:59Z`),
@@ -2243,6 +2243,15 @@ const GetCashbookReport = async (req, res) => {
   }
 };
 
+const GetAlltheCashbokYears = async (req, res) => {
+  try {
+    const response = await CashBookYearModel.find({}).distinct("year");
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
   CreateNewFinancialYear,
   ChangeTheStatusOfTransaction,
@@ -2250,6 +2259,7 @@ module.exports = {
   GetUnapprovedData,
   // Casbookin and transaction route ===========
   AddNewDataCashbook,
+  GetAlltheCashbokYears,
   GetAllCashbook,
   AddTheTransaction,
   DeleteTransaction,
