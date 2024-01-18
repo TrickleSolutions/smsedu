@@ -47,4 +47,4 @@ const CreateFinancialYearAndCloseLastYear = async () => {
 // set the auto financial Year Change on 31 dec 11 pm every year
 
 // cron.schedule("* * * * *" , CreateFinancialYearAndCloseLastYear)
-// cron.schedule("0 23 31 12 *", CreateFinancialYearAndCloseLastYear);
+cron.schedule("0 23 31 12 *", CreateFinancialYearAndCloseLastYear);
