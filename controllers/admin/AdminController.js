@@ -2252,7 +2252,39 @@ const GetAlltheCashbokYears = async (req, res) => {
   }
 };
 
+// get all the balance report as per instructor
+const GetBlanceReportOfStudents = async (req, res) => {
+  const { instructor } = req.params;
+  const response = await BatchModel.aggregate([
+    { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
+    {
+      $lookup: {
+        from: "student_registers",
+        foreignField: "_id",
+        localField: "students",
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: "addfee_tbls",
+        //       foreignField:""
+        //     },
+        //   },
+        // ],
+        as: "students",
+      },
+    },
+  ]);
+  try {
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 module.exports = {
+  // Balance Reports
+  GetBlanceReportOfStudents,
+  // ================Financial years ===========
   CreateNewFinancialYear,
   ChangeTheStatusOfTransaction,
   GetTheYearTransactions,
