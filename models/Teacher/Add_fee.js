@@ -10,6 +10,10 @@ const AddFeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    student: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "student_registers",
+    },
     name: {
       type: String,
       required: true,
@@ -24,11 +28,14 @@ const AddFeeSchema = new mongoose.Schema(
     },
     mode: {
       type: String,
+      enum: ["upi", "cash", "bank-transfer"],
       required: true,
     },
     transId: {
       type: String,
-      required: true,
+      required: () => {
+        return this.mode === "upi" || this.mode === "bank-transfer";
+      },
     },
     paid: {
       type: Number,

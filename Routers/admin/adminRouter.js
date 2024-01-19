@@ -131,6 +131,7 @@ const {
   UploadNotesOnLessionPlan,
   GetCashbookReport,
   GetAlltheCashbokYears,
+  GetBlanceReportOfStudents,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -338,5 +339,8 @@ Router.route("/cashbook/transaction/get-unapproved/:year").get(
 );
 Router.route("/cashbook/report/:year").get(GetCashbookReport);
 Router.route("/cashbook/transaction/cashbook-years").get(GetAlltheCashbokYears);
+
+// Get all the Balance Report of the batches students as per instructor
+Router.route("/balance-report/:instructor").get(GetBlanceReportOfStudents);
 
 module.exports = Router;
