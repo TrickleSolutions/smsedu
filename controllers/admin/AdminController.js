@@ -1,4 +1,5 @@
 const InstructorRegisterSchema = require("../../models/admin/InstructorModel");
+const moment = require("moment");
 const AdminRegisterSchema = require("../../models/admin/Admin_reg");
 const CourseSchema = require("../../models/admin/Add_Course");
 const Enquiry_adminSchema = require("../../models/admin/Enquiry_admin");
@@ -1960,7 +1961,7 @@ const DeleteSliderImg = async (req, res) => {
 };
 
 const GetSliderImg = async (req, res) => {
-  const { id, distinct } = req.query;
+  const { id } = req.query;
 
   try {
     const _find = id ? { _id: id } : {};
@@ -1977,6 +1978,15 @@ const GetSliderImg = async (req, res) => {
     res
       .status(200)
       .json({ error: false, message: "success", data: response[0] });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetSlderImages = async (req, res) => {
+  try {
+    const response = await SliderModel.find({});
+    res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }
@@ -2255,26 +2265,96 @@ const GetAlltheCashbokYears = async (req, res) => {
 // get all the balance report as per instructor
 const GetBlanceReportOfStudents = async (req, res) => {
   const { instructor } = req.params;
-  const response = await BatchModel.aggregate([
-    { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
-    {
-      $lookup: {
-        from: "student_registers",
-        foreignField: "_id",
-        localField: "students",
-        // pipeline: [
-        //   {
-        //     $lookup: {
-        //       from: "addfee_tbls",
-        //       foreignField:""
-        //     },
-        //   },
-        // ],
-        as: "students",
-      },
-    },
-  ]);
+  const today = new Date();
+  const lastMonth = new Date(today);
+  lastMonth.setMonth(today.getMonth() - 1);
+  const month = parseInt(moment(lastMonth).format("MM"));
+  const year = parseInt(moment(lastMonth).year());
+
   try {
+    const response = await BatchModel.aggregate([
+      { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
+      {
+        $lookup: {
+          from: "student_registers",
+          foreignField: "_id",
+          localField: "students",
+          pipeline: [
+            {
+              $lookup: {
+                from: "addfee_tbls",
+                foreignField: "student",
+                localField: "_id",
+                pipeline: [
+                  { $sort: { createdAt: -1 } },
+                  {
+                    $group: {
+                      _id: "feeInfo",
+                      totalAmountPaid: { $sum: "$paid" },
+                      totalAmountDue: { $first: "$pending" },
+                      allEntries: { $push: "$$ROOT" },
+                    },
+                  },
+                ],
+                as: "feeInfo",
+              },
+            },
+            // {
+            //   $addFields: {
+            //     lastMonth: {
+            //       $filter: {
+            //         input: "$ROOT",
+            //         as: "item",
+            //         cond: {
+            //           $and: [
+            //             {
+            //               $gte: [
+            //                 "$$item.createdAt",
+            //                 {
+            //                   $dateFromParts: {
+            //                     year: {
+            //                       $year: { $subtract: ["$$NOW", 1] },
+            //                     },
+            //                     month: {
+            //                       $month: { $subtract: ["$$NOW", 1] },
+            //                     },
+            //                     day: 1,
+            //                     hour: 0,
+            //                     minute: 0,
+            //                     second: 0,
+            //                     millisecond: 0,
+            //                   },
+            //                 },
+            //               ],
+            //             },
+            //             {
+            //               $lt: [
+            //                 "$$item.createdAt",
+            //                 {
+            //                   $dateFromParts: {
+            //                     year: { $year: "$$NOW" },
+            //                     month: { $month: "$$NOW" },
+            //                     day: 1,
+            //                     hour: 0,
+            //                     minute: 0,
+            //                     second: 0,
+            //                     millisecond: 0,
+            //                   },
+            //                 },
+            //               ],
+            //             },
+            //           ],
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
+          ],
+          as: "students",
+        },
+      },
+    ]);
+
     res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
@@ -2305,6 +2385,7 @@ module.exports = {
   DeleteNewDayByDayPlan,
   GetAllDayByDay,
   // Slider ====================================
+  GetSlderImages,
   AddInSlider,
   UpadateSliderImg,
   DeleteSliderImg,

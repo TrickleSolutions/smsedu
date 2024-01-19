@@ -132,6 +132,7 @@ const {
   GetCashbookReport,
   GetAlltheCashbokYears,
   GetBlanceReportOfStudents,
+  GetSlderImages,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -308,6 +309,7 @@ Router.route("/slider/add").post(AddInSlider);
 Router.route("/slider/update/:id/:img").patch(UpadateSliderImg);
 Router.route("/slider/delete/:id").delete(DeleteSliderImg);
 Router.route("/slider/get").get(GetSliderImg);
+Router.route("/slider/getall").get(GetSlderImages);
 
 // ====================== New DayByDay
 Router.route("/new-daybyday/create").post(CreateDaybyDayPlan);
