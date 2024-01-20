@@ -69,4 +69,6 @@ Router.route("/feedback/update/:id").patch(UpdateFeedback);
 Router.route("/feedback/delete/:id").delete(DeleteFeedback);
 Router.route("/feedback/get").get(GetFeedback);
 
+// Router.route('/student/course/analytics/:student' ).get()
+
 module.exports = Router;

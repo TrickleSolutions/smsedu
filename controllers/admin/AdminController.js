@@ -2266,10 +2266,25 @@ const GetAlltheCashbokYears = async (req, res) => {
 const GetBlanceReportOfStudents = async (req, res) => {
   const { instructor } = req.params;
   const today = new Date();
+  const todayYear = parseInt(moment(today).year());
+  const todayMonth = moment(today).format("MM");
   const lastMonth = new Date(today);
   lastMonth.setMonth(today.getMonth() - 1);
   const month = parseInt(moment(lastMonth).format("MM"));
   const year = parseInt(moment(lastMonth).year());
+  const dates = {
+    startDate: new Date(year, month - 1, 1, 0, 0, 0),
+    endDate: new Date(year, month, 0, 23, 59, 59),
+  };
+
+  // Format the date and time
+  const lastMonthFormatted = lastMonth.toISOString();
+  const firstDayOfCurrentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+  const firstDayOfCurrentMonthFormatted = firstDayOfCurrentMonth.toISOString();
 
   try {
     const response = await BatchModel.aggregate([
@@ -2292,63 +2307,28 @@ const GetBlanceReportOfStudents = async (req, res) => {
                       _id: "feeInfo",
                       totalAmountPaid: { $sum: "$paid" },
                       totalAmountDue: { $first: "$pending" },
-                      allEntries: { $push: "$$ROOT" },
+                      feeEntries: { $push: "$$ROOT" },
+                    },
+                  },
+                  {
+                    $project: {
+                      _id: 1,
+                      totalAmountDue: 1,
+                      totalAmountPaid: 1,
+                      feeEntries: {
+                        $filter: {
+                          input: "$feeEntries",
+                          as: "entry",
+                          cond: { eq: [true, true] },
+                        },
+                      },
+                      feeDate: `${todayYear}-${todayMonth}-01T00:20:28Z`,
                     },
                   },
                 ],
                 as: "feeInfo",
               },
             },
-            // {
-            //   $addFields: {
-            //     lastMonth: {
-            //       $filter: {
-            //         input: "$ROOT",
-            //         as: "item",
-            //         cond: {
-            //           $and: [
-            //             {
-            //               $gte: [
-            //                 "$$item.createdAt",
-            //                 {
-            //                   $dateFromParts: {
-            //                     year: {
-            //                       $year: { $subtract: ["$$NOW", 1] },
-            //                     },
-            //                     month: {
-            //                       $month: { $subtract: ["$$NOW", 1] },
-            //                     },
-            //                     day: 1,
-            //                     hour: 0,
-            //                     minute: 0,
-            //                     second: 0,
-            //                     millisecond: 0,
-            //                   },
-            //                 },
-            //               ],
-            //             },
-            //             {
-            //               $lt: [
-            //                 "$$item.createdAt",
-            //                 {
-            //                   $dateFromParts: {
-            //                     year: { $year: "$$NOW" },
-            //                     month: { $month: "$$NOW" },
-            //                     day: 1,
-            //                     hour: 0,
-            //                     minute: 0,
-            //                     second: 0,
-            //                     millisecond: 0,
-            //                   },
-            //                 },
-            //               ],
-            //             },
-            //           ],
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
           ],
           as: "students",
         },

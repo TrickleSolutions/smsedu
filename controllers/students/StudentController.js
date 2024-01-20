@@ -10,6 +10,7 @@ const VerifyModel = require("../../models/VerifyModel");
 const { read } = require("fs");
 const { default: mongoose } = require("mongoose");
 const FeedBackModel = require("../../models/students/Feedback");
+const StudentModel = require("../../models/students/StudentModel");
 const createSt = async (req, resp, next) => {
   try {
     const formData = req.body;
@@ -564,6 +565,27 @@ const GetFeedback = async (req, res) => {
     res.status(500).json({ error: true, message: error.message });
   }
 };
+
+// const GetStudentCourseAnalytics = async (req, res) => {
+//   const { student } = req.params;
+//   try {
+//     const response = await StudentModel.aggregate([
+//       { $match: { _id: new mongoose.Types.ObjectId(student) } },
+//       {
+//         $project: {
+//           totalCourses: 1,
+//           ActiveCourses : {
+//             cond:{
+//               if :{ $eq :["$"]}
+//             }
+//           }
+//         },
+//       },
+//     ]);
+//   } catch (error) {
+//     res.status(500).json({ error: true, message: error.message });
+//   }
+// };
 module.exports = {
   // feedback
   CreateFeedback,
