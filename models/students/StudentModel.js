@@ -3,6 +3,8 @@ const Student_RegisterSchema = new mongoose.Schema(
   {
     regno: {
       type: Number,
+      required: true,
+      unique: true,
       // required:true
     },
     name: {
@@ -19,6 +21,8 @@ const Student_RegisterSchema = new mongoose.Schema(
     },
     contact: {
       type: Number,
+      required: true,
+      unique: true,
       //  required:true
     },
     email: {
