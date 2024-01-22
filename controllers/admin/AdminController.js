@@ -2424,6 +2424,20 @@ const GetBlanceReportOfStudents = async (req, res) => {
         },
       },
       { $unwind: "$course" },
+      {
+        $project: {
+          _id: 1,
+          instructor: 1,
+          batchTime: 1,
+          course: 1,
+          students: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          totalAmountPaid: { $arrayElemAt: ["$students.amountPaid", 0] },
+          totalAmountDue: { $arrayElemAt: ["$students.amountPaid", 0] },
+          totalLastMonthPaid: { $arrayElemAt: ["$students.lastMonthPaid", 0] },
+        },
+      },
     ]);
 
     res.status(200).json({ error: false, message: "success", data: response });

@@ -287,8 +287,23 @@ const delResult = async (req, res) => {
   }
 };
 const getAllResult = async (req, res) => {
-  let data = await resultSchema.find();
-  res.send(data);
+  try {
+    let data = await resultSchema.aggregate([
+      { $match: {} },
+      {
+        $lookup: {
+          from: "student_registers",
+          localField: "student",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      { $unwind: "$student" },
+    ]);
+    res.send(data);
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
 };
 const getsingleResult = async (req, res) => {
   let data = await resultSchema.find({ regno: req.params.regno });
