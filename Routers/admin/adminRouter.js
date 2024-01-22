@@ -133,6 +133,7 @@ const {
   GetAlltheCashbokYears,
   GetBlanceReportOfStudents,
   GetSlderImages,
+  GetAllLessionTopics,
   // ---------cetrificates end --------------
 } = require("../../controllers/admin/AdminController");
 const course_upload = require("../../multer/admin/course_upload");
@@ -316,6 +317,7 @@ Router.route("/new-daybyday/create").post(CreateDaybyDayPlan);
 Router.route("/new-daybyday/update/:id").patch(UpdateDayByDayPlan);
 Router.route("/new-daybyday/delete/:id").delete(DeleteNewDayByDayPlan);
 Router.route("/new-daybyday/get").get(GetAllDayByDay);
+Router.route("/lessions/getalltopic/:course").get(GetAllLessionTopics);
 
 // Cash ledger Cashsbook Routes
 

@@ -2044,24 +2044,45 @@ const DeleteNewDayByDayPlan = async (req, res) => {
 const GetAllDayByDay = async (req, res) => {
   const { course } = req.query;
   try {
-    const response = await NewDayByDayModel.aggregate([
-      {
-        $lookup: {
-          from: "new_course_lessions",
-          localField: "plan.theory",
-          foreignField: "topic._id",
-          as: "plansdata",
-        },
-      },
-      {
-        $project: {
-          course: 1,
-          plan: 1,
-          plansData: { $arrayElemAt: ["$plansdata.topic", 0] },
-        },
-      },
-    ]);
+    // const response = await NewDayByDayModel.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: "new_course_lessions",
+    //       localField: "plan.theory",
+    //       foreignField: "topic._id",
+    //       as: "plansdata",
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       course: 1,
+    //       plan: 1,
+    //       plansData: { $arrayElemAt: ["$plansdata.topic", 0] },
+    //     },
+    //   },
+    // ]);
+
+    const response = await NewDayByDayModel.find({}).populate("course").exec();
     res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+const GetAllLessionTopics = async (req, res) => {
+  const { course } = req.params;
+  try {
+    const response = await NewCourseLessionSchema.find({ course: course });
+
+    // Extract topics from each document and flatten the array
+    const allTopics = [].concat(...response.map((lesson) => lesson.topic));
+
+    // Use a Set to ensure uniqueness
+    const uniqueTopics = [...new Set(allTopics)];
+
+    res
+      .status(200)
+      .json({ error: false, message: "success", data: uniqueTopics });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }
@@ -2489,6 +2510,7 @@ module.exports = {
   // New Day By Day ===================
   CreateDaybyDayPlan,
   UpdateDayByDayPlan,
+  GetAllLessionTopics,
   DeleteNewDayByDayPlan,
   GetAllDayByDay,
   // Slider ====================================
