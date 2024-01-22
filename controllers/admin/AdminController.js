@@ -2392,10 +2392,7 @@ const GetBlanceReportOfStudents = async (req, res) => {
                 regno: 1,
                 name: 1,
                 amountDue: {
-                  $ifNull: [
-                    { $arrayElemAt: ["$payments.AmountDue", 0] },
-                    { $arrayElemAt: ["$courseFee.price", 0] },
-                  ],
+                  $ifNull: [{ $arrayElemAt: ["$payments.AmountDue", 0] }, 0],
                 },
                 amountPaid: {
                   $ifNull: [{ $arrayElemAt: ["$payments.AmountPaid", 0] }, 0],
@@ -2407,7 +2404,10 @@ const GetBlanceReportOfStudents = async (req, res) => {
                   ],
                 },
                 feeDate: {
-                  $ifNull: [{ $arrayElemAt: ["$payments.feeDate", 0] }, 0],
+                  $ifNull: [
+                    { $arrayElemAt: ["$payments.feeDate", 0] },
+                    `${todayYear}-${todayMonth}-01T00:20:28Z`,
+                  ],
                 },
 
                 admdate: 1,
