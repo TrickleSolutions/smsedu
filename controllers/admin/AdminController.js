@@ -2291,6 +2291,23 @@ const GetBlanceReportOfStudents = async (req, res) => {
       { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
       {
         $lookup: {
+          from: "course_admins",
+          localField: "course",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $project: {
+                title: 1,
+                price: 1,
+              },
+            },
+          ],
+          as: "course",
+        },
+      },
+      { $unwind: "$course" },
+      {
+        $lookup: {
           from: "student_registers",
           foreignField: "_id",
           localField: "students",
@@ -2374,10 +2391,25 @@ const GetBlanceReportOfStudents = async (req, res) => {
               $project: {
                 regno: 1,
                 name: 1,
-                amountDue: { $arrayElemAt: ["$payments.AmountDue", 0] },
-                amountPaid: { $arrayElemAt: ["$payments.AmountPaid", 0] },
-                lastMonthPaid: { $arrayElemAt: ["$payments.lastMonthPaid", 0] },
-                feeDate: { $arrayElemAt: ["$payments.feeDate", 0] },
+                amountDue: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$payments.AmountDue", 0] },
+                    { $arrayElemAt: ["$courseFee.price", 0] },
+                  ],
+                },
+                amountPaid: {
+                  $ifNull: [{ $arrayElemAt: ["$payments.AmountPaid", 0] }, 0],
+                },
+                lastMonthPaid: {
+                  $ifNull: [
+                    { $arrayElemAt: ["$payments.lastMonthPaid", 0] },
+                    0,
+                  ],
+                },
+                feeDate: {
+                  $ifNull: [{ $arrayElemAt: ["$payments.feeDate", 0] }, 0],
+                },
+
                 admdate: 1,
                 shift: 1,
                 course: 1,
@@ -2407,23 +2439,7 @@ const GetBlanceReportOfStudents = async (req, res) => {
         },
       },
       { $unwind: "$instructor" },
-      {
-        $lookup: {
-          from: "course_admins",
-          localField: "course",
-          foreignField: "_id",
-          pipeline: [
-            {
-              $project: {
-                title: 1,
-                price: 1,
-              },
-            },
-          ],
-          as: "course",
-        },
-      },
-      { $unwind: "$course" },
+
       {
         $project: {
           _id: 1,
@@ -2433,9 +2449,15 @@ const GetBlanceReportOfStudents = async (req, res) => {
           students: 1,
           createdAt: 1,
           updatedAt: 1,
-          totalAmountPaid: { $arrayElemAt: ["$students.amountPaid", 0] },
-          totalAmountDue: { $arrayElemAt: ["$students.amountPaid", 0] },
-          totalLastMonthPaid: { $arrayElemAt: ["$students.lastMonthPaid", 0] },
+          totalAmountPaid: {
+            $sum: "$students.amountPaid",
+          },
+          totalAmountDue: {
+            $sum: "$students.amountPaid",
+          },
+          totalLastMonthPaid: {
+            $sum: "$students.lastMonthPaid",
+          },
         },
       },
     ]);
