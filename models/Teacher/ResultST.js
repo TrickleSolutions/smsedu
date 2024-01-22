@@ -3,6 +3,7 @@ const result_Schema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "student_registers ",
+    required: true,
   },
   name: {
     type: String,
