@@ -2315,176 +2315,195 @@ const GetBlanceReportOfStudents = async (req, res) => {
 
   try {
     const response = await BatchModel.aggregate([
-      { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
       {
-        $lookup: {
-          from: "course_admins",
-          localField: "course",
-          foreignField: "_id",
-          pipeline: [
-            {
-              $project: {
-                title: 1,
-                price: 1,
-              },
-            },
-          ],
-          as: "course",
-        },
-      },
-      { $unwind: "$course" },
-      {
-        $lookup: {
-          from: "student_registers",
-          foreignField: "_id",
-          localField: "students",
-          pipeline: [
-            {
-              $lookup: {
-                from: "addfee_tbls",
-                foreignField: "student",
-                localField: "_id",
-                pipeline: [
-                  { $sort: { createdAt: -1 } },
-                  {
-                    $group: {
-                      _id: "$course",
-                      AmountPaid: { $sum: "$paid" },
-                      AmountDue: { $first: "$pending" },
-                      feeEntries: { $push: "$$ROOT" },
-                    },
-                  },
-                  {
-                    $project: {
-                      _id: 1,
-                      AmountDue: 1,
-                      AmountPaid: 1,
-                      lastMonthPaid: {
-                        $arrayElemAt: [
-                          {
-                            $map: {
-                              input: {
-                                $filter: {
-                                  input: "$feeEntries",
-                                  as: "entry",
-                                  cond: {
-                                    $eq: [
-                                      {
-                                        $dateToString: {
-                                          date: "$$entry.date",
-                                          format: "%Y-%m",
-                                        },
-                                      },
-                                      {
-                                        $dateToString: {
-                                          date: new Date(lastMonthFormatted),
-                                          format: "%Y-%m",
-                                        },
-                                      },
-                                    ],
-                                  },
-                                },
-                              },
-                              as: "filteredEntry",
-                              in: { $sum: "$$filteredEntry.paid" },
-                            },
-                          },
-                          0,
-                        ],
-                      },
-                      feeDate: `${todayYear}-${todayMonth}-01T00:20:28Z`,
-                    },
-                  },
-                ],
-                as: "payments",
-              },
-            },
+        $facet: {
+          data: [
+            { $match: { instructor: new mongoose.Types.ObjectId(instructor) } },
             {
               $lookup: {
                 from: "course_admins",
                 localField: "course",
-                foreignField: "title",
+                foreignField: "_id",
                 pipeline: [
                   {
                     $project: {
+                      title: 1,
                       price: 1,
                     },
                   },
                 ],
-                as: "courseFee",
+                as: "course",
+              },
+            },
+            { $unwind: "$course" },
+            {
+              $lookup: {
+                from: "student_registers",
+                foreignField: "_id",
+                localField: "students",
+                pipeline: [
+                  {
+                    $lookup: {
+                      from: "addfee_tbls",
+                      foreignField: "student",
+                      localField: "_id",
+                      pipeline: [
+                        { $sort: { createdAt: -1 } },
+                        {
+                          $group: {
+                            _id: "$course",
+                            AmountPaid: { $sum: "$paid" },
+                            AmountDue: { $first: "$pending" },
+                            feeEntries: { $push: "$$ROOT" },
+                          },
+                        },
+                        {
+                          $project: {
+                            _id: 1,
+                            AmountDue: 1,
+                            AmountPaid: 1,
+                            lastMonthPaid: {
+                              $arrayElemAt: [
+                                {
+                                  $map: {
+                                    input: {
+                                      $filter: {
+                                        input: "$feeEntries",
+                                        as: "entry",
+                                        cond: {
+                                          $eq: [
+                                            {
+                                              $dateToString: {
+                                                date: "$$entry.date",
+                                                format: "%Y-%m",
+                                              },
+                                            },
+                                            {
+                                              $dateToString: {
+                                                date: new Date(
+                                                  lastMonthFormatted
+                                                ),
+                                                format: "%Y-%m",
+                                              },
+                                            },
+                                          ],
+                                        },
+                                      },
+                                    },
+                                    as: "filteredEntry",
+                                    in: { $sum: "$$filteredEntry.paid" },
+                                  },
+                                },
+                                0,
+                              ],
+                            },
+                            feeDate: `${todayYear}-${todayMonth}-01T00:20:28Z`,
+                          },
+                        },
+                      ],
+                      as: "payments",
+                    },
+                  },
+                  {
+                    $lookup: {
+                      from: "course_admins",
+                      localField: "course",
+                      foreignField: "title",
+                      pipeline: [
+                        {
+                          $project: {
+                            price: 1,
+                          },
+                        },
+                      ],
+                      as: "courseFee",
+                    },
+                  },
+                  {
+                    $project: {
+                      regno: 1,
+                      name: 1,
+                      amountDue: {
+                        $ifNull: [
+                          { $arrayElemAt: ["$payments.AmountDue", 0] },
+                          { $arrayElemAt: ["$courseFee.price", 0] },
+                        ],
+                      },
+                      amountPaid: {
+                        $ifNull: [
+                          { $arrayElemAt: ["$payments.AmountPaid", 0] },
+                          0,
+                        ],
+                      },
+                      lastMonthPaid: {
+                        $ifNull: [
+                          { $arrayElemAt: ["$payments.lastMonthPaid", 0] },
+                          0,
+                        ],
+                      },
+                      feeDate: {
+                        $ifNull: [
+                          { $arrayElemAt: ["$payments.feeDate", 0] },
+                          `${todayYear}-${todayMonth}-01T00:20:28Z`,
+                        ],
+                      },
+
+                      admdate: 1,
+                      shift: 1,
+                      course: 1,
+                      contact: 1,
+                      status: 1,
+                      courseFee: { $arrayElemAt: ["$courseFee.price", 0] },
+                    },
+                  },
+                ],
+                as: "students",
               },
             },
             {
+              $lookup: {
+                from: "instructorregisters",
+                foreignField: "_id",
+                localField: "instructor",
+                pipeline: [
+                  {
+                    $project: {
+                      name: 1,
+                    },
+                  },
+                ],
+                as: "instructor",
+              },
+            },
+            { $unwind: "$instructor" },
+            {
               $project: {
-                regno: 1,
-                name: 1,
-                amountDue: {
-                  $ifNull: [{ $arrayElemAt: ["$payments.AmountDue", 0] }, 0],
-                },
-                amountPaid: {
-                  $ifNull: [{ $arrayElemAt: ["$payments.AmountPaid", 0] }, 0],
-                },
-                lastMonthPaid: {
-                  $ifNull: [
-                    { $arrayElemAt: ["$payments.lastMonthPaid", 0] },
-                    0,
-                  ],
-                },
-                feeDate: {
-                  $ifNull: [
-                    { $arrayElemAt: ["$payments.feeDate", 0] },
-                    `${todayYear}-${todayMonth}-01T00:20:28Z`,
-                  ],
-                },
-
-                admdate: 1,
-                shift: 1,
+                _id: 1,
+                instructor: 1,
+                batchTime: 1,
                 course: 1,
-                contact: 1,
-                status: 1,
-                courseFee: { $arrayElemAt: ["$courseFee.price", 0] },
+                students: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                totalAmountPaid: {
+                  $sum: "$students.amountPaid",
+                },
+                totalAmountDue: {
+                  $sum: "$students.amountDue",
+                },
+                totalLastMonthPaid: {
+                  $sum: "$students.lastMonthPaid",
+                },
               },
             },
           ],
-          as: "students",
         },
       },
-
       {
-        $lookup: {
-          from: "instructorregisters",
-          foreignField: "_id",
-          localField: "instructor",
-          pipeline: [
-            {
-              $project: {
-                name: 1,
-              },
-            },
-          ],
-          as: "instructor",
-        },
-      },
-      { $unwind: "$instructor" },
-
-      {
-        $project: {
-          _id: 1,
-          instructor: 1,
-          batchTime: 1,
-          course: 1,
-          students: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          totalAmountPaid: {
-            $sum: "$students.amountPaid",
-          },
-          totalAmountDue: {
-            $sum: "$students.amountPaid",
-          },
-          totalLastMonthPaid: {
-            $sum: "$students.lastMonthPaid",
-          },
+        $addFields: {
+          finalMonthPaid: { $sum: "$data.totalLastMonthPaid" },
+          finalAmountPaid: { $sum: "$data.totalAmountPaid" },
+          finalAmoutDue: { $sum: "$data.totalAmountDue" },
         },
       },
     ]);
