@@ -2061,8 +2061,14 @@ const GetAllDayByDay = async (req, res) => {
     //     },
     //   },
     // ]);
+    let _find = {};
+    if (course) {
+      _find = { course: course };
+    }
 
-    const response = await NewDayByDayModel.find({}).populate("course").exec();
+    const response = await NewDayByDayModel.find(_find)
+      .populate("course")
+      .exec();
     res.status(200).json({ error: false, message: "success", data: response });
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
