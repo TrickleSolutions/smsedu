@@ -310,6 +310,23 @@ const getsingleResult = async (req, res) => {
   res.send(data);
 };
 
+const GetResultUploadStudent = async (req, res) => {
+  const { id } = req.params;
+  const { certificate } = req.query;
+  try {
+    const response = await resultSchema.findByIdAndUpdate(id, {
+      certificate: certificate,
+    });
+    if (!response && certificate)
+      return res
+        .status(400)
+        .json({ error: true, message: "please provide the certificate url" });
+    res.status(200).json({ error: false, message: "success", data: response });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
 {
   /*     ScheduleClas */
 }
@@ -1181,6 +1198,7 @@ module.exports = {
   getsingleResult,
   delResult,
   putResult,
+  GetResultUploadStudent,
   createResult,
   putStStatusReq,
   deleteStStatusReq,
