@@ -20,9 +20,6 @@ const result_Schema = new mongoose.Schema({
   },
   certificate: {
     type: String,
-    required: function () {
-      return this.resultType === "final";
-    },
   },
   course: {
     type: String,
