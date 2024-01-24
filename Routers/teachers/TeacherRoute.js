@@ -77,6 +77,7 @@ const {
   UpdateTypingResult,
   DeletetheTypingResult,
   GetTheTypingResult,
+  GetResultUploadStudent,
 } = require("../../controllers/teachers/TeacherController");
 /**fee */
 
@@ -169,6 +170,7 @@ Router.get("/marks", getAllResult);
 Router.route("/marks/:regno").put(putResult);
 Router.route("/marks/:regno").delete(delResult);
 Router.route("/marks/:regno").get(getsingleResult);
+Router.route("/result/upload/student/:id").get(GetResultUploadStudent);
 
 /**ADD ASSignmenyt */
 

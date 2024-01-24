@@ -18,7 +18,12 @@ const result_Schema = new mongoose.Schema({
     type: Number,
     //   required: true,
   },
-
+  certificate: {
+    type: String,
+    required: function () {
+      return this.resultType === "final";
+    },
+  },
   course: {
     type: String,
     //  required: true,
