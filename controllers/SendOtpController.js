@@ -9,13 +9,14 @@ function generateOTP() {
 
 const msgFormat = (number, otp) => {
   const query = {
-    username: "demostew",
-    apikey: "2B8F7-8B25D",
-    apirequest: "Text",
-    sender: "STEWIN",
-    mobile: number,
-    message: `Dear User Your One time password for Login is ${otp} Valid till 4 Minutes STEWINDIA `,
-    route: "TRANS",
+    key: "564E06C89106D7",
+    campaign: "11704",
+    routeid: "37",
+    type: "text",
+    senderid: "AIRCAM",
+    contacts: number,
+    msg: `Dear Customer your OTP is- ${otp} Please do not share your OTP anyone.`,
+    template_id: "1207161520274849189",
   };
 
   // Convert it to the query string
@@ -30,18 +31,17 @@ module.exports = async (req, res) => {
     const otp = generateOTP();
     const generatedString = msgFormat(number, otp);
 
-    const smsApiUrl =
-      "http://sms.stewindia.com/sms-panel/api/http/sendsms.php?";
+    const smsApiUrl = "http://byebyesms.com/app/smsapi/index.php?";
     const response = await axios.get(smsApiUrl + generatedString);
     // console.log(smsApiUrl + generatedString);
 
     if (response.status === 200) {
       const isReqStored = await new VerifyModel({
         otp: otp,
-        otpid: `${response.data["message-id"]}`,
+        otpid: response.data,
         otpExpireTime: Date.now() + 40000,
       }).save();
-      console.log(isReqStored);
+
       if (!isReqStored) {
         return res
           .status(400)
